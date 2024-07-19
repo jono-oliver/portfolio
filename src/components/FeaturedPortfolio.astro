@@ -7,7 +7,7 @@ const projects = await getProjects();
 ---
 
 <section
-  class="min-h-screen bg-slate-100 lg:flex lg:items-center lg:justify-center dark:bg-slate-800"
+  class="bg-slate-100 lg:flex lg:min-h-screen lg:items-center lg:justify-center dark:bg-slate-800"
 >
   <div class="container py-8 lg:py-16">
     <div class="flex flex-col items-center justify-center" data-aos="fade-in">
@@ -29,6 +29,7 @@ const projects = await getProjects();
             slug={project.slug.current}
             title={project.projectTitle}
             excerpt={project.projectExcerpt}
+            imageCard={project.projectCardImage}
             imageCardUrl={urlFor(project.projectCardImage)}
             stack={project.projectTechStack}
           />

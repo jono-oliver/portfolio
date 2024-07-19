@@ -7,11 +7,14 @@ const { title, type, projectImage, slug, excerpt, stack } = Astro.props;
   class="rounded-xl bg-slate-200 bg-opacity-90 dark:bg-slate-950 dark:bg-opacity-90"
   data-aos="zoom-in"
 >
-  <a href=`/${type}/${slug}` class="group p-4 lg:flex lg:items-center lg:p-6">
+  <a
+    href=`/${type}/${slug}`
+    class="group px-4 focus:outline-none focus:ring focus:ring-slate-800 focus:ring-opacity-80 lg:block lg:flex lg:items-center lg:p-6 hover:dark:border-gray-200 dark:hover:text-white focus:dark:ring-slate-100"
+  >
     <div class="lg:flex lg:items-center">
       <div class="max-w-[600px] overflow-hidden">
         <SanityImage
-          classes="object-cover w-full h-72 lg:h-96 transition-transform duration-1000 group-hover:scale-110"
+          classes="object-cover w-full h-72 lg:h-96 lg:transition-transform lg:duration-1000 group-hover:lg:scale-110"
           node={projectImage}
           width="1440"
         />
