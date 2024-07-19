@@ -1,0 +1,27 @@
+---
+import Article from "../../components/Article.astro";
+import HeadingBlock from "../../components/HeadingBlock.astro";
+import Layout from "../../layouts/Layout.astro";
+import { getArticles } from "../../sanity/useSanityHelper";
+
+const articles = await getArticles();
+---
+
+<Layout title="Jonathan Oliver | Front End Engineer | Portfolio">
+  <HeadingBlock title="Blog" subTitle="Learn, Engage, Have some fun!" />
+  <section class="container grid gap-4 pb-8 lg:gap-8">
+    {
+      articles.map((article) => (
+        <Article
+          key={article.id}
+          type="blog"
+          slug={article.slug.current}
+          title={article.articleTitle}
+          excerpt={article.articleExcerpt}
+          projectImage={article.articleImage}
+          stack={article.articleTags}
+        />
+      ))
+    }
+  </section>
+</Layout>

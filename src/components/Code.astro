@@ -1,0 +1,9 @@
+---
+import { Prism } from "@astrojs/prism";
+
+const { node } = Astro.props;
+---
+
+<div class="flex p-4 text-xl">
+  <Prism lang={node.language} code={node.code} />
+</div>

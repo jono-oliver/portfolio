@@ -1,0 +1,39 @@
+---
+import { getProjects, urlFor } from "../sanity/useSanityHelper";
+
+import PortfolioCard from "./PortfolioCard.astro";
+
+const projects = await getProjects();
+---
+
+<section
+  class="min-h-screen bg-slate-100 lg:flex lg:items-center lg:justify-center dark:bg-slate-800"
+>
+  <div class="container py-8 lg:py-16">
+    <div class="flex flex-col items-center justify-center" data-aos="fade-in">
+      <h2 class="text-gray-800 dark:text-white">Portfolio</h2>
+      <p class="mt-4 text-center text-gray-800 lg:w-1/2 dark:text-white">
+        Explore how I craft compelling user experiences with clean, efficient
+        code. Dive in and discover how I can bring value to your team with my
+        creative solutions and attention to detail.
+      </p>
+    </div>
+
+    <div
+      class="mt-8 grid grid-cols-1 gap-8 md:grid-cols-2 xl:mt-12 xl:grid-cols-3 xl:gap-12"
+    >
+      {
+        projects.map((project) => (
+          <PortfolioCard
+            key={project.id}
+            slug={project.slug.current}
+            title={project.projectTitle}
+            excerpt={project.projectExcerpt}
+            imageCardUrl={urlFor(project.projectCardImage)}
+            stack={project.projectTechStack}
+          />
+        ))
+      }
+    </div>
+  </div>
+</section>

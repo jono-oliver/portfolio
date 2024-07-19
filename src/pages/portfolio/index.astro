@@ -1,0 +1,30 @@
+---
+import Article from "../../components/Article.astro";
+import HeadingBlock from "../../components/HeadingBlock.astro";
+import Layout from "../../layouts/Layout.astro";
+import { getProjects } from "../../sanity/useSanityHelper";
+
+const projects = await getProjects();
+---
+
+<Layout title="Jonathan Oliver | Front End Engineer | Portfolio">
+  <HeadingBlock
+    title="Portfolio"
+    subTitle="A Showcase of Cutting-Edge Front-End Projects"
+  />
+  <section class="container grid gap-4 pb-8 lg:gap-8">
+    {
+      projects.map((project) => (
+        <Article
+          key={project.id}
+          type="portfolio"
+          slug={project.slug.current}
+          title={project.projectTitle}
+          excerpt={project.projectExcerpt}
+          projectImage={project.projectImage}
+          stack={project.projectTechStack}
+        />
+      ))
+    }
+  </section>
+</Layout>
