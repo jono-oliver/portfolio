@@ -12,12 +12,21 @@ export async function getStaticPaths() {
 }
 
 const { slug } = Astro.params;
-const { projectTitle, projectImage, projectTechStack, projectDescription } =
-  await getProject(slug);
+const {
+  projectTitle,
+  projectImage,
+  projectExcerpt,
+  projectTechStack,
+  projectDescription,
+} = await getProject(slug);
 ---
 
 <Layout
   title=`Jonathan Oliver | Front End Engineer | Portfolio | ${projectTitle}`
+  metaTitle={projectTitle}
+  metaDescription={projectExcerpt}
+  metaImage={projectImage}
+  metaUrl=`https://jonooliver.dev/portfolio/${slug}`
 >
   <header class="mb-4 lg:mb-8">
     <SanityImage
