@@ -1,7 +1,7 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import PortableText from "../../components/PortableText.astro";
-import { getArticle, getArticles } from "../../sanity/useSanityHelper";
+import { getArticle, getArticles, urlFor } from "../../sanity/useSanityHelper";
 import SanityImage from "../../components/SanityImage.astro";
 
 export async function getStaticPaths() {
@@ -19,13 +19,14 @@ const {
   articleTags,
   articleDescription,
 } = await getArticle(slug);
+const metaImageUrl = urlFor(articleImage).url();
 ---
 
 <Layout
   title=`Jonathan Oliver | Front End Engineer | Portfolio | ${articleTitle}`
   metaTitle={articleTitle}
   metaDescription={articleExcerpt}
-  metaImage={articleImage}
+  metaImage={metaImageUrl}
   metaUrl=`https://jonooliver.dev/blog/${slug}`
 >
   <header class="mb-4 lg:mb-8">
