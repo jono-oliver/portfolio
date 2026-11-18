@@ -1,8 +1,21 @@
 ---
-const { title, subTitle } = Astro.props;
+const { title, subTitle, label } = Astro.props;
 ---
 
-<section class="container my-6 lg:my-12">
-  <h1>{title}</h1>
-  <h2>{subTitle}</h2>
+<section class="container pb-6 pt-12 lg:pb-10 lg:pt-20">
+  <div data-reveal="up">
+    <span class="eyebrow"
+      ><span class="marker" aria-hidden="true"></span>{label ?? "Index"}</span
+    >
+  </div>
+  <h1 class="mt-6 text-display font-bold">
+    <span data-reveal="mask"><span>{title}</span></span>
+  </h1>
+  <p
+    class="mt-6 max-w-xl text-lg text-muted lg:text-xl"
+    data-reveal="up"
+    style="--reveal-delay: 150ms"
+  >
+    {subTitle}
+  </p>
 </section>

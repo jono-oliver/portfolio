@@ -1,0 +1,20 @@
+---
+const { href, title, label } = Astro.props;
+---
+
+<nav class="border-t border-line" aria-label={label}>
+  <a href={href} class="group container block py-16 lg:py-24">
+    <span class="eyebrow">{label}</span>
+    <span
+      class="mt-4 flex items-center justify-between gap-6 font-heading text-display-md font-bold uppercase"
+    >
+      <span
+        class="break-words transition-transform duration-700 ease-out-expo group-hover:translate-x-4"
+        >{title}</span
+      >
+      <span class="arrow shrink-0 text-accent-text" aria-hidden="true"
+        >&rarr;</span
+      >
+    </span>
+  </a>
+</nav>

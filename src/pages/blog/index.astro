@@ -14,12 +14,17 @@ const articles = await getArticles();
   metaImage="https://plus.unsplash.com/premium_photo-1661338857151-779ee51362c6?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
   metaUrl=`https://jonooliver.dev/blog`
 >
-  <HeadingBlock title="Blog" subTitle="Learn, Engage, Have some fun!" />
-  <section class="container grid gap-4 pb-8 lg:gap-8">
+  <HeadingBlock
+    title="Blog"
+    subTitle="Learn, Engage, Have some fun!"
+    label="Writing"
+  />
+  <section class="container pb-16 lg:pb-24">
     {
-      articles.map((article) => (
+      articles.map((article, index) => (
         <Article
-          key={article.id}
+          key={article._id}
+          index={index}
           type="blog"
           slug={article.slug.current}
           title={article.articleTitle}
