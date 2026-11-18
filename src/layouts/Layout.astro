@@ -21,7 +21,10 @@ const { title, metaTitle, metaDescription, metaUrl, metaImage } = Astro.props;
   <head>
     <meta charset="UTF-8" />
     <meta name="description" content={metaDescription} />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
 
     <!-- Open Graph meta tags -->
     <meta property="og:title" content={metaTitle} />
@@ -161,6 +164,10 @@ const { title, metaTitle, metaDescription, metaUrl, metaImage } = Astro.props;
 
   body {
     @apply bg-paper font-body text-ink;
+    /* viewport-fit=cover lets the page run under the notch in landscape,
+       so keep content clear of it */
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
   }
 
   /* Subtle film grain over everything, works in both themes */
