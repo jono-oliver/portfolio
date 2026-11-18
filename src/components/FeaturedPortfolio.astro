@@ -1,40 +1,56 @@
 ---
-import { getProjects, urlFor } from "../sanity/useSanityHelper";
+import { getProjects } from "../sanity/useSanityHelper";
 
 import PortfolioCard from "./PortfolioCard.astro";
 
 const projects = await getProjects();
 ---
 
-<section
-  class="bg-slate-100 lg:flex lg:min-h-screen lg:items-center lg:justify-center dark:bg-slate-800"
->
-  <div class="container py-8 lg:py-16">
-    <div class="flex flex-col items-center justify-center" data-aos="fade-in">
-      <h2 class="text-gray-800 dark:text-white">Portfolio</h2>
-      <p class="mt-4 text-center text-gray-800 lg:w-1/2 dark:text-white">
-        Explore how I craft compelling user experiences with clean, efficient
-        code. Dive in and discover how I can bring value to your team with my
-        creative solutions and attention to detail.
-      </p>
+<section id="work" class="container scroll-mt-20 py-20 lg:py-32">
+  <div
+    class="grid gap-6 border-b border-line pb-10 lg:grid-cols-12 lg:items-end"
+  >
+    <div class="lg:col-span-6">
+      <span class="eyebrow" data-reveal="up"
+        ><span class="marker" aria-hidden="true"></span>Recent projects</span
+      >
+      <h2 class="mt-4 text-display-sm font-bold">
+        <span data-reveal="mask"><span>Portfolio</span></span>
+      </h2>
     </div>
-
-    <div
-      class="mt-8 grid grid-cols-1 gap-8 md:grid-cols-2 xl:mt-12 xl:grid-cols-3 xl:gap-12"
+    <p
+      class="max-w-md leading-relaxed text-muted lg:col-span-5 lg:col-start-8"
+      data-reveal="up"
+      style="--reveal-delay: 120ms"
     >
-      {
-        projects.map((project) => (
-          <PortfolioCard
-            key={project.id}
-            slug={project.slug.current}
-            title={project.projectTitle}
-            excerpt={project.projectExcerpt}
-            imageCard={project.projectCardImage}
-            imageCardUrl={urlFor(project.projectCardImage)}
-            stack={project.projectTechStack}
-          />
-        ))
-      }
-    </div>
+      Explore how I craft compelling user experiences with clean, efficient
+      code. Dive in and discover how I can bring value to your team with my
+      creative solutions and attention to detail.
+    </p>
+  </div>
+
+  <ul>
+    {
+      projects.map((project, index) => (
+        <PortfolioCard
+          key={project._id}
+          index={index}
+          slug={project.slug.current}
+          title={project.projectTitle}
+          excerpt={project.projectExcerpt}
+          imageCard={project.projectCardImage}
+          stack={project.projectTechStack}
+        />
+      ))
+    }
+  </ul>
+
+  <div class="mt-12 flex justify-end">
+    <a
+      href="/portfolio"
+      class="link-underline group inline-flex items-center gap-2 text-sm font-medium"
+    >
+      View all work <span class="arrow" aria-hidden="true">&rarr;</span>
+    </a>
   </div>
 </section>

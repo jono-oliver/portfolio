@@ -1,11 +1,41 @@
 /** @type {import('tailwindcss').Config} */
+const token = (name) => `rgb(var(--${name}) / <alpha-value>)`;
+
 export default {
   content: ["./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}"],
   theme: {
     extend: {
+      colors: {
+        paper: token("paper"),
+        ink: token("ink"),
+        muted: token("muted"),
+        line: token("line"),
+        accent: token("accent"),
+        "accent-text": token("accent-text"),
+      },
       fontFamily: {
         heading: ["Archivo", "sans-serif"],
         body: ["Poppins", "sans-serif"],
+      },
+      fontSize: {
+        display: [
+          "clamp(3.25rem, 13vw, 12rem)",
+          { lineHeight: "0.9", letterSpacing: "-0.04em" },
+        ],
+        "display-md": [
+          "clamp(2.25rem, 5vw, 4.5rem)",
+          { lineHeight: "1", letterSpacing: "-0.03em" },
+        ],
+        "display-sm": [
+          "clamp(2.5rem, 7vw, 6rem)",
+          { lineHeight: "0.95", letterSpacing: "-0.035em" },
+        ],
+      },
+      transitionTimingFunction: {
+        "out-expo": "cubic-bezier(0.16, 1, 0.3, 1)",
+      },
+      maxWidth: {
+        measure: "68ch",
       },
     },
     container: {

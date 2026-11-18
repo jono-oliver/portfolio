@@ -17,12 +17,14 @@ const projects = await getProjects();
   <HeadingBlock
     title="Portfolio"
     subTitle="A Showcase of Cutting-Edge Front-End Projects"
+    label="Recent projects"
   />
-  <section class="container grid gap-4 pb-8 lg:gap-8">
+  <section class="container pb-16 lg:pb-24">
     {
-      projects.map((project) => (
+      projects.map((project, index) => (
         <Article
-          key={project.id}
+          key={project._id}
+          index={index}
           type="portfolio"
           slug={project.slug.current}
           title={project.projectTitle}

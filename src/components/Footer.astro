@@ -1,0 +1,52 @@
+---
+import { getProfile } from "../sanity/useSanityHelper";
+
+const { name, contactEmail } = await getProfile();
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-line">
+  <div class="container py-20 lg:py-28">
+    <span class="eyebrow" data-reveal="up"
+      ><span class="marker" aria-hidden="true"></span>Contact</span
+    >
+    <h2 class="mt-6 text-display-sm font-bold">
+      <span data-reveal="mask"><span>Let's work</span></span>
+      <span data-reveal="mask" style="--reveal-delay: 100ms">
+        <span>together<span class="text-accent-text">.</span></span>
+      </span>
+    </h2>
+    <a
+      href={`mailto:${contactEmail}`}
+      class="link-underline group mt-10 inline-flex items-center gap-4 break-all font-heading text-xl sm:text-2xl lg:text-4xl"
+      data-reveal="up"
+      style="--reveal-delay: 200ms"
+    >
+      {contactEmail}
+      <span class="arrow text-accent-text" aria-hidden="true">&rarr;</span>
+    </a>
+  </div>
+
+  <div
+    class="container flex flex-col gap-4 border-t border-line py-6 text-sm text-muted sm:flex-row sm:items-center sm:justify-between"
+  >
+    <span>&copy; {year} {name}</span>
+    <div class="flex items-center gap-6">
+      <a
+        href="https://www.linkedin.com/in/jonathan-oliver-92056496/?originalSubdomain=uk"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="link-underline hover:text-ink">LinkedIn</a
+      >
+      <a
+        href="https://github.com/jonooliver"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="link-underline hover:text-ink">GitHub</a
+      >
+      <a href="#main" class="link-underline hover:text-ink"
+        >Back to top &uarr;</a
+      >
+    </div>
+  </div>
+</footer>

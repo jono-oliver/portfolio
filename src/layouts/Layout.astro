@@ -7,9 +7,10 @@ interface Props {
   metaImage: string;
 }
 
+import { ViewTransitions } from "astro:transitions";
 import Navbar from "../components/Navbar.astro";
+import Footer from "../components/Footer.astro";
 
-import "aos/dist/aos.css"; // AOS styles
 import "prism-themes/themes/prism-a11y-dark.css"; // Prism Theme
 
 const { title, metaTitle, metaDescription, metaUrl, metaImage } = Astro.props;
@@ -19,8 +20,8 @@ const { title, metaTitle, metaDescription, metaUrl, metaImage } = Astro.props;
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="description" content="Astro description" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={metaDescription} />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <!-- Open Graph meta tags -->
     <meta property="og:title" content={metaTitle} />
@@ -41,47 +42,45 @@ const { title, metaTitle, metaDescription, metaUrl, metaImage } = Astro.props;
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
 
-    <script>
-      const htmlElement = document.querySelector("html"),
-        darkModeToggle = document.querySelector("[data-toggle-dark-mode]");
-
+    <!-- Runs before paint so the chosen theme never flashes -->
+    <script is:inline>
       const applyTheme = () => {
-        const systemPreference = window.matchMedia(
-            "(prefers-color-scheme: dark)",
-          ).matches
-            ? "dark"
-            : "light",
-          userPreference = localStorage.getItem("theme");
-
-        if (userPreference) {
-          htmlElement.classList.toggle("dark", userPreference === "dark");
-        } else {
-          htmlElement.classList.toggle("dark", systemPreference === "dark");
-        }
+        let stored = null;
+        try {
+          stored = localStorage.getItem("theme");
+        } catch (e) {}
+        const prefersDark = window.matchMedia(
+          "(prefers-color-scheme: dark)",
+        ).matches;
+        const root = document.documentElement;
+        root.classList.toggle("dark", stored ? stored === "dark" : prefersDark);
+        root.classList.add("js");
       };
 
       applyTheme();
-
-      darkModeToggle.addEventListener("click", (e) => {
-        const isDarkMode = htmlElement.classList.toggle("dark");
-
-        e.preventDefault();
-
-        localStorage.setItem("theme", isDarkMode ? "dark" : "light");
-      });
+      document.addEventListener("astro:after-swap", applyTheme);
     </script>
+
+    <ViewTransitions />
   </head>
-  <body>
+  <body class="flex min-h-full flex-col">
+    <a
+      href="#main"
+      class="sr-only z-50 bg-ink px-4 py-2 text-paper focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+    >
+      Skip to content
+    </a>
     <Navbar />
-    <main>
+    <main id="main" class="flex-1">
       <slot />
     </main>
+    <Footer />
 
     <script>
-      import { aosInit } from "../js/aos";
+      import { initReveal } from "../js/reveal";
 
-      // runs on initial page load
-      aosInit();
+      // Runs on first load and after every view transition
+      document.addEventListener("astro:page-load", initReveal);
     </script>
   </body>
 </html>
@@ -135,14 +134,64 @@ const { title, metaTitle, metaDescription, metaUrl, metaImage } = Astro.props;
     src: url("../fonts/poppins-v21-latin-700.woff2") format("woff2");
   }
 
-  html {
-    @apply box-border h-full scroll-smooth bg-slate-50 text-base;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 800 800'%3E%3Cg fill='none' stroke='%23ECECEC' stroke-width='1'%3E%3Cpath d='M769 229L1037 260.9M927 880L731 737 520 660 309 538 40 599 295 764 126.5 879.5 40 599-197 493 102 382-31 229 126.5 79.5-69-63'/%3E%3Cpath d='M-31 229L237 261 390 382 603 493 308.5 537.5 101.5 381.5M370 905L295 764'/%3E%3Cpath d='M520 660L578 842 731 737 840 599 603 493 520 660 295 764 309 538 390 382 539 269 769 229 577.5 41.5 370 105 295 -36 126.5 79.5 237 261 102 382 40 599 -69 737 127 880'/%3E%3Cpath d='M520-140L578.5 42.5 731-63M603 493L539 269 237 261 370 105M902 382L539 269M390 382L102 382'/%3E%3Cpath d='M-222 42L126.5 79.5 370 105 539 269 577.5 41.5 927 80 769 229 902 382 603 493 731 737M295-36L577.5 41.5M578 842L295 764M40-201L127 80M102 382L-261 269'/%3E%3C/g%3E%3Cg fill='%23F0F0F0'%3E%3Ccircle cx='769' cy='229' r='5'/%3E%3Ccircle cx='539' cy='269' r='5'/%3E%3Ccircle cx='603' cy='493' r='5'/%3E%3Ccircle cx='731' cy='737' r='5'/%3E%3Ccircle cx='520' cy='660' r='5'/%3E%3Ccircle cx='309' cy='538' r='5'/%3E%3Ccircle cx='295' cy='764' r='5'/%3E%3Ccircle cx='40' cy='599' r='5'/%3E%3Ccircle cx='102' cy='382' r='5'/%3E%3Ccircle cx='127' cy='80' r='5'/%3E%3Ccircle cx='370' cy='105' r='5'/%3E%3Ccircle cx='578' cy='42' r='5'/%3E%3Ccircle cx='237' cy='261' r='5'/%3E%3Ccircle cx='390' cy='382' r='5'/%3E%3C/g%3E%3C/svg%3E");
+  :root {
+    --paper: 248 250 252; /* slate-50 */
+    --ink: 15 23 42; /* slate-900 */
+    --muted: 100 116 139; /* slate-500 */
+    --line: 226 232 240; /* slate-200 */
+    --accent: 30 41 59; /* slate-800 */
+    --accent-text: 30 41 59; /* slate-800 */
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    color-scheme: light;
   }
 
   html.dark {
-    @apply bg-slate-900;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 800 800'%3E%3Cg fill='none' stroke='%23070B13' stroke-width='1'%3E%3Cpath d='M769 229L1037 260.9M927 880L731 737 520 660 309 538 40 599 295 764 126.5 879.5 40 599-197 493 102 382-31 229 126.5 79.5-69-63'/%3E%3Cpath d='M-31 229L237 261 390 382 603 493 308.5 537.5 101.5 381.5M370 905L295 764'/%3E%3Cpath d='M520 660L578 842 731 737 840 599 603 493 520 660 295 764 309 538 390 382 539 269 769 229 577.5 41.5 370 105 295 -36 126.5 79.5 237 261 102 382 40 599 -69 737 127 880'/%3E%3Cpath d='M520-140L578.5 42.5 731-63M603 493L539 269 237 261 370 105M902 382L539 269M390 382L102 382'/%3E%3Cpath d='M-222 42L126.5 79.5 370 105 539 269 577.5 41.5 927 80 769 229 902 382 603 493 731 737M295-36L577.5 41.5M578 842L295 764M40-201L127 80M102 382L-261 269'/%3E%3C/g%3E%3Cg fill='%231B294A'%3E%3Ccircle cx='769' cy='229' r='5'/%3E%3Ccircle cx='539' cy='269' r='5'/%3E%3Ccircle cx='603' cy='493' r='5'/%3E%3Ccircle cx='731' cy='737' r='5'/%3E%3Ccircle cx='520' cy='660' r='5'/%3E%3Ccircle cx='309' cy='538' r='5'/%3E%3Ccircle cx='295' cy='764' r='5'/%3E%3Ccircle cx='40' cy='599' r='5'/%3E%3Ccircle cx='102' cy='382' r='5'/%3E%3Ccircle cx='127' cy='80' r='5'/%3E%3Ccircle cx='370' cy='105' r='5'/%3E%3Ccircle cx='578' cy='42' r='5'/%3E%3Ccircle cx='237' cy='261' r='5'/%3E%3Ccircle cx='390' cy='382' r='5'/%3E%3C/g%3E%3C/svg%3E");
+    --paper: 2 6 23; /* slate-950 */
+    --ink: 248 250 252; /* slate-50 */
+    --muted: 148 163 184; /* slate-400 */
+    --line: 30 41 59; /* slate-800 */
+    --accent: 153 27 27; /* red-800 */
+    --accent-text: 239 68 68; /* red-500 */
+    color-scheme: dark;
+  }
+
+  html {
+    @apply box-border h-full scroll-smooth bg-paper text-base text-ink antialiased;
+  }
+
+  body {
+    @apply bg-paper font-body text-ink;
+  }
+
+  /* Subtle film grain over everything, works in both themes */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  html.dark body::after {
+    opacity: 0.07;
+  }
+
+  .theme-switching *,
+  .theme-switching *::before,
+  .theme-switching *::after {
+    transition: none !important;
+  }
+
+  ::selection {
+    @apply bg-accent text-white;
+  }
+
+  :focus-visible {
+    outline: 2px solid rgb(var(--accent-text));
+    outline-offset: 4px;
+    border-radius: 2px;
   }
 
   h1,
@@ -151,18 +200,111 @@ const { title, metaTitle, metaDescription, metaUrl, metaImage } = Astro.props;
   h4,
   h5,
   h6 {
-    @apply font-heading;
+    @apply font-heading text-ink;
   }
 
   h1 {
-    @apply text-4xl font-medium uppercase tracking-wide text-gray-800 lg:text-5xl dark:text-white;
+    @apply text-4xl font-bold uppercase tracking-tight lg:text-5xl;
   }
 
   h2 {
-    @apply text-3xl font-medium uppercase tracking-wide text-gray-800 lg:text-4xl dark:text-white;
+    @apply text-3xl font-medium uppercase tracking-tight lg:text-4xl;
   }
 
-  body {
-    @apply font-body;
+  .eyebrow {
+    @apply inline-flex items-center gap-2.5 font-body text-xs font-medium uppercase tracking-[0.2em] text-muted;
+  }
+
+  /* Small accent square, the same motif as the full stop after the name */
+  .marker {
+    @apply inline-block h-1.5 w-1.5 shrink-0 bg-accent-text;
+  }
+
+  /* Arrow that nudges on hover of its parent .group */
+  .arrow {
+    @apply inline-block transition-transform duration-500 ease-out-expo group-hover:translate-x-1.5;
+  }
+
+  /* Animated underline used by nav and text links */
+  .link-underline {
+    @apply relative;
+  }
+
+  .link-underline::after {
+    content: "";
+    @apply absolute -bottom-1 left-0 h-px w-full origin-right scale-x-0 bg-current transition-transform duration-500 ease-out-expo;
+  }
+
+  .link-underline:hover::after,
+  .link-underline[aria-current="page"]::after {
+    @apply origin-left scale-x-100;
+  }
+
+  /* ---------- Scroll reveals (see src/js/reveal.js) ---------- */
+  .js [data-reveal="up"] {
+    opacity: 0;
+    transform: translateY(24px);
+    transition-property: opacity, transform;
+    transition-duration: 1s;
+    transition-timing-function: var(--ease-out-expo);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  .js [data-reveal="mask"] {
+    display: block;
+    overflow: hidden;
+    /* room for descenders so they are not clipped */
+    padding-bottom: 0.08em;
+    margin-bottom: -0.08em;
+  }
+
+  .js [data-reveal="mask"] > * {
+    display: block;
+    transform: translateY(110%);
+    transition: transform 1.2s var(--ease-out-expo) var(--reveal-delay, 0ms);
+  }
+
+  /* Clip the child, not the observed element: a fully clipped target
+     never reports as intersecting */
+  .js [data-reveal="image"] > * {
+    transition:
+      clip-path 1.4s var(--ease-out-expo),
+      transform 1.6s var(--ease-out-expo);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  .js [data-reveal="image"]:not(.is-visible) > * {
+    clip-path: inset(100% 0 0 0);
+    transform: scale(1.08);
+  }
+
+  .js [data-reveal].is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  .js [data-reveal="mask"].is-visible > * {
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    .js [data-reveal],
+    .js [data-reveal] > *,
+    .js [data-reveal] img {
+      opacity: 1 !important;
+      transform: none !important;
+      clip-path: none !important;
+      transition: none !important;
+    }
+
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+      animation: none !important;
+    }
   }
 </style>

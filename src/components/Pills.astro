@@ -1,0 +1,30 @@
+---
+// Shared pill list used for skills, tech stacks and tags.
+// `hoverable`: each pill darkens on its own hover.
+// `inverts`: pills turn white when the parent .group row is hovered or
+// focused (used on the accent fill rows on the home page).
+const {
+  items = [],
+  hoverable = false,
+  inverts = false,
+  class: className,
+  ...rest
+} = Astro.props;
+---
+
+<ul class:list={["flex flex-wrap gap-2", className]} {...rest}>
+  {
+    items.map((item) => (
+      <li
+        class:list={[
+          "rounded-full border border-line px-3.5 py-1.5 text-xs text-muted transition-colors duration-300",
+          hoverable && "hover:border-ink hover:text-ink",
+          inverts &&
+            "lg:group-hover:border-white/30 lg:group-hover:text-white/80 lg:group-focus-visible:border-white/30 lg:group-focus-visible:text-white/80",
+        ]}
+      >
+        {item}
+      </li>
+    ))
+  }
+</ul>

@@ -1,17 +1,29 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import PortableText from "../../components/PortableText.astro";
+import DetailHeader from "../../components/DetailHeader.astro";
+import NextLink from "../../components/NextLink.astro";
+import Prose from "../../components/Prose.astro";
 import { getProject, getProjects, urlFor } from "../../sanity/useSanityHelper";
-import SanityImage from "../../components/SanityImage.astro";
 
 export async function getStaticPaths() {
   const projects = await getProjects();
-  return projects.map((project) => ({
-    params: { slug: project.slug.current },
-  }));
+  return projects.map((project, index) => {
+    const next = projects[(index + 1) % projects.length];
+    return {
+      params: { slug: project.slug.current },
+      props: {
+        next:
+          projects.length > 1
+            ? { slug: next.slug.current, title: next.projectTitle }
+            : null,
+      },
+    };
+  });
 }
 
 const { slug } = Astro.params;
+const { next } = Astro.props;
 const {
   projectTitle,
   projectImage,
@@ -29,36 +41,28 @@ const metaImageUrl = urlFor(projectImage).url();
   metaImage={metaImageUrl}
   metaUrl=`https://jonooliver.dev/portfolio/${slug}`
 >
-  <header class="mb-4 lg:mb-8">
-    <SanityImage
-      classes="object-cover object-center w-full h-80 xl:h-[28rem]"
-      node={projectImage}
-      width="1440"
-    />
+  <DetailHeader
+    title={projectTitle}
+    excerpt={projectExcerpt}
+    tags={projectTechStack}
+    tagsLabel="Stack"
+    image={projectImage}
+    backHref="/portfolio"
+    backLabel="All work"
+    transitionName={`portfolio-${slug}`}
+  />
 
-    <div
-      class="mx-auto max-w-[1000px] rounded-xl bg-slate-50 p-4 lg:relative lg:-mt-20 dark:bg-slate-900"
-    >
-      <h1 class="mb-4">{projectTitle}</h1>
-
-      <div>
-        <ul class="flex list-none flex-wrap items-center gap-4">
-          {
-            projectTechStack.map((type) => (
-              <li class="w-max rounded-lg border border-gray-900 px-3 py-1.5 text-xs font-bold uppercase text-gray-700 dark:border-white dark:text-white">
-                {type}
-              </li>
-            ))
-          }
-        </ul>
-      </div>
-    </div>
-  </header>
-
-  <article
-    class="prose mx-auto max-w-[1000px] px-4 pb-8 dark:prose-invert prose-headings:font-medium prose-headings:text-gray-800 prose-h2:text-3xl prose-p:text-gray-800 prose-h2:lg:text-4xl dark:prose-headings:text-white dark:prose-p:text-white"
-    data-aos="fade-in"
-  >
+  <Prose>
     <PortableText value={projectDescription} />
-  </article>
+  </Prose>
+
+  {
+    next && (
+      <NextLink
+        href={`/portfolio/${next.slug}`}
+        title={next.title}
+        label="Next project"
+      />
+    )
+  }
 </Layout>

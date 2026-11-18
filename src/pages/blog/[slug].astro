@@ -1,17 +1,29 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import PortableText from "../../components/PortableText.astro";
+import DetailHeader from "../../components/DetailHeader.astro";
+import NextLink from "../../components/NextLink.astro";
+import Prose from "../../components/Prose.astro";
 import { getArticle, getArticles, urlFor } from "../../sanity/useSanityHelper";
-import SanityImage from "../../components/SanityImage.astro";
 
 export async function getStaticPaths() {
   const articles = await getArticles();
-  return articles.map((article) => ({
-    params: { slug: article.slug.current },
-  }));
+  return articles.map((article, index) => {
+    const next = articles[(index + 1) % articles.length];
+    return {
+      params: { slug: article.slug.current },
+      props: {
+        next:
+          articles.length > 1
+            ? { slug: next.slug.current, title: next.articleTitle }
+            : null,
+      },
+    };
+  });
 }
 
 const { slug } = Astro.params;
+const { next } = Astro.props;
 const {
   articleTitle,
   articleImage,
@@ -29,36 +41,28 @@ const metaImageUrl = urlFor(articleImage).url();
   metaImage={metaImageUrl}
   metaUrl=`https://jonooliver.dev/blog/${slug}`
 >
-  <header class="mb-4 lg:mb-8">
-    <SanityImage
-      classes="object-cover object-center w-full h-80 xl:h-[28rem]"
-      node={articleImage}
-      width="1440"
-    />
+  <DetailHeader
+    title={articleTitle}
+    excerpt={articleExcerpt}
+    tags={articleTags}
+    tagsLabel="Tags"
+    image={articleImage}
+    backHref="/blog"
+    backLabel="All articles"
+    transitionName={`blog-${slug}`}
+  />
 
-    <div
-      class="mx-auto max-w-[1000px] rounded-xl bg-slate-50 p-4 lg:relative lg:-mt-20 dark:bg-slate-900"
-    >
-      <h1 class="mb-4">{articleTitle}</h1>
-
-      <div>
-        <ul class="flex list-none flex-wrap items-center gap-4">
-          {
-            articleTags.map((tag) => (
-              <li class="w-max rounded-lg border border-gray-900 px-3 py-1.5 text-xs font-bold uppercase text-gray-700 dark:border-white dark:text-white">
-                {tag}
-              </li>
-            ))
-          }
-        </ul>
-      </div>
-    </div>
-  </header>
-
-  <article
-    class="dark:prose-dark prose mx-auto max-w-[1000px] px-4 pb-8 dark:prose-invert"
-    data-aos="fade-in"
-  >
+  <Prose>
     <PortableText value={articleDescription} />
-  </article>
+  </Prose>
+
+  {
+    next && (
+      <NextLink
+        href={`/blog/${next.slug}`}
+        title={next.title}
+        label="Next article"
+      />
+    )
+  }
 </Layout>
