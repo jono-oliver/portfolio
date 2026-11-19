@@ -3,6 +3,7 @@ import { sanityClient } from "sanity:client";
 import { getProfile } from "../sanity/useSanityHelper";
 import SanityImage from "../components/SanityImage.astro";
 import SkillsGrid from "./SkillsGrid.astro";
+import SkillsMarquee from "./SkillsMarquee.astro";
 
 const profile = await getProfile();
 const { name, bio, contactEmail, skills, resume, profilePicture, jobRole } =
@@ -156,7 +157,14 @@ const bioRest = bioMatch ? bioMatch[2] : "";
     </div>
   </div>
 
-  <SkillsGrid items={skills} delay={300} />
+  <div class="flex flex-col gap-4 lg:gap-5">
+    <SkillsMarquee
+      items={skills}
+      data-reveal="up"
+      style="--reveal-delay: 300ms"
+    />
+    <SkillsGrid items={skills} delay={400} />
+  </div>
 
   <a
     href="#work"

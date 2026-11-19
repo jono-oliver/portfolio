@@ -1,0 +1,78 @@
+---
+// Decorative single-row skills ticker. Data comes straight from the Sanity
+// profile `skills` array passed in as `items`. The full, readable list sits
+// below it (SkillsGrid), so this is hidden from screen readers.
+// Reduced motion shows a static, edge-faded row.
+interface Props {
+  items: string[];
+  [key: string]: any;
+}
+
+const { items = [], class: className, ...rest } = Astro.props;
+
+// Keep speed consistent regardless of how many skills there are
+const duration = `${Math.max(items.length * 2.75, 28)}s`;
+---
+
+<div
+  class:list={["marquee overflow-hidden", className]}
+  aria-hidden="true"
+  {...rest}
+>
+  <div class="marquee-track flex w-max" style={`--marquee-duration: ${duration}`}>
+    {
+      [0, 1].map((copy) => (
+        <div class:list={["flex shrink-0", copy && "is-copy"]}>
+          {items.map((item) => (
+            <span class="flex items-center gap-4 whitespace-nowrap pr-4 font-heading text-lg font-medium tracking-tight text-muted transition-colors duration-300 hover:text-ink sm:text-xl lg:gap-6 lg:pr-6 lg:text-2xl">
+              {item}
+              <span class="marker" />
+            </span>
+          ))}
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .marquee {
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 8%,
+      #000 92%,
+      transparent
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 8%,
+      #000 92%,
+      transparent
+    );
+  }
+
+  .marquee-track {
+    animation: marquee var(--marquee-duration, 40s) linear infinite;
+  }
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track {
+      animation: none;
+    }
+
+    .is-copy {
+      display: none;
+    }
+  }
+</style>
