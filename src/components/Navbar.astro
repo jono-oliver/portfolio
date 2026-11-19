@@ -90,9 +90,21 @@ const isActive = (href: string) =>
           title="X-ray mode (Shift+X)"
           class="hidden h-9 w-9 place-items-center rounded-full border border-line text-ink transition-colors duration-300 hover:border-ink aria-pressed:border-accent-text aria-pressed:bg-accent-text aria-pressed:text-white md:grid"
         >
-          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-            <path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4" />
-            <path d="M8 12h8M12 8v8" stroke-dasharray="2 2" />
+          <!-- "Inspect element": dashed selection box with a cursor -->
+          <svg class="xray-icon h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+              class="xray-icon-box"
+              d="M10 20H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v5"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-dasharray="2.5 2.5"></path>
+            <path
+              d="M12.5 12.5l8.5 3-3.6 1.4-1.4 3.6z"
+              fill="currentColor"
+              stroke="currentColor"
+              stroke-width="1.2"
+              stroke-linejoin="round"></path>
           </svg>
         </button>
         <button
@@ -171,9 +183,22 @@ const isActive = (href: string) =>
     }
   }
 
+  /* Marching-ants outline on hover, and continuously while X-ray is on */
+  [data-xray-toggle]:hover .xray-icon-box,
+  [data-xray-toggle][aria-pressed="true"] .xray-icon-box {
+    animation: xray-ants 0.8s linear infinite;
+  }
+
+  @keyframes xray-ants {
+    to {
+      stroke-dashoffset: -10;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .theme-icon {
-      animation: none;
+    .theme-icon,
+    .xray-icon-box {
+      animation: none !important;
     }
   }
 </style>
