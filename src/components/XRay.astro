@@ -1,0 +1,406 @@
+---
+// X-ray mode: reveals how the page is built.
+// - 12-column layout grid matching the site's container
+// - Dashed outlines + labels for every component tagged with data-xray="Name"
+// - Hover inspector: element box, padding/margin, size and type details
+// - HUD with viewport, breakpoint and real page-load stats
+// Toggled by any [data-xray-toggle] button (see Navbar) or Shift+X; Esc exits.
+// All overlay DOM is created on demand, so it costs nothing until switched on.
+---
+
+<script>
+  type Stats = { load: string; weight: string; nodes: number };
+
+  let enabled = false;
+  let layer: HTMLDivElement | null = null;
+  let hovered: Element | null = null;
+  let raf = 0;
+
+  const root = document.documentElement;
+  const px = (v: string) => Math.round(parseFloat(v) || 0);
+
+  const breakpoint = (w: number) =>
+    w >= 1536 ? "2xl" : w >= 1280 ? "xl" : w >= 1024 ? "lg" : w >= 768 ? "md" : w >= 640 ? "sm" : "base";
+
+  const toHex = (rgb: string) => {
+    const m = rgb.match(/\d+(\.\d+)?/g);
+    if (!m) return rgb;
+    const [r, g, b] = m.map(Number);
+    return "#" + [r, g, b].map((n) => n.toString(16).padStart(2, "0")).join("").toUpperCase();
+  };
+
+  // Real numbers from the browser's own performance timings
+  const pageStats = (): Stats => {
+    const nav = performance.getEntriesByType("navigation")[0] as
+      | PerformanceNavigationTiming
+      | undefined;
+    const resources = performance.getEntriesByType(
+      "resource",
+    ) as PerformanceResourceTiming[];
+    const bytes = [nav, ...resources].reduce(
+      (sum, e) => sum + (e ? e.transferSize || e.encodedBodySize || 0 : 0),
+      0,
+    );
+    const load = nav && nav.loadEventEnd > 0 ? nav.loadEventEnd : nav?.domContentLoadedEventEnd;
+    return {
+      load: load ? `${(load / 1000).toFixed(2)}s` : "n/a",
+      weight: bytes ? `${Math.round(bytes / 1024)} KB` : "n/a",
+      nodes: document.getElementsByTagName("*").length,
+    };
+  };
+
+  const el = (tag: string, className: string, html = "") => {
+    const node = document.createElement(tag);
+    node.className = className;
+    if (html) node.innerHTML = html;
+    return node as HTMLDivElement;
+  };
+
+  const build = () => {
+    layer = el("div", "xray-layer");
+    layer.setAttribute("aria-hidden", "true");
+
+    // Layout grid, built from the same container + 12 columns the site uses
+    const grid = el(
+      "div",
+      "pointer-events-none fixed inset-0 z-[60]",
+      `<div class="container grid h-full grid-cols-4 gap-4 md:grid-cols-12 lg:gap-8">${Array.from(
+        { length: 12 },
+        (_, i) =>
+          `<div class="xray-col ${i >= 4 ? "hidden md:block" : ""}"><span>${i + 1}</span></div>`,
+      ).join("")}</div>`,
+    );
+
+    // Inspector: margin box, border-box (padding drawn as borders), tooltip
+    const margin = el("div", "xray-margin");
+    const box = el("div", "xray-box");
+    const tip = el("div", "xray-tip");
+
+    const s = pageStats();
+    const hud = el(
+      "div",
+      "xray-hud",
+      `<p class="xray-hud-title"><span class="marker"></span>X-ray</p>
+       <dl>
+         <div><dt>Viewport</dt><dd data-xray-viewport></dd></div>
+         <div><dt>Stack</dt><dd>Astro · Tailwind · Sanity</dd></div>
+         <div><dt>Loaded in</dt><dd>${s.load}</dd></div>
+         <div><dt>Page weight</dt><dd>${s.weight}</dd></div>
+         <div><dt>DOM nodes</dt><dd>${s.nodes}</dd></div>
+       </dl>
+       <p class="xray-hud-hint">Hover to inspect · <kbd>Esc</kbd> to exit</p>`,
+    );
+
+    layer.append(grid, margin, box, tip, hud);
+    document.body.append(layer);
+    updateViewport();
+  };
+
+  const updateViewport = () => {
+    const v = layer?.querySelector("[data-xray-viewport]");
+    if (v)
+      v.textContent = `${innerWidth} × ${innerHeight} · ${breakpoint(innerWidth)}`;
+  };
+
+  const describe = (target: Element) => {
+    const cs = getComputedStyle(target);
+    const r = target.getBoundingClientRect();
+    const h = target as HTMLElement;
+    const name = h.dataset.xray
+      ? `&lt;${h.dataset.xray} /&gt;`
+      : target.tagName.toLowerCase() +
+        [...target.classList]
+          .slice(0, 2)
+          .map((c) => `<span class="xray-dim">.${c}</span>`)
+          .join("");
+    const owner = target.parentElement?.closest<HTMLElement>("[data-xray]")?.dataset.xray;
+
+    const lines = [
+      `<strong>${name}</strong>`,
+      `${Math.round(r.width)} × ${Math.round(r.height)}`,
+    ];
+
+    const pad = [cs.paddingTop, cs.paddingRight, cs.paddingBottom, cs.paddingLeft].map(px);
+    if (pad.some(Boolean)) lines.push(`padding ${pad.join(" ")}`);
+
+    const hasText = [...target.childNodes].some(
+      (n) => n.nodeType === Node.TEXT_NODE && n.textContent?.trim(),
+    );
+    if (hasText) {
+      const family = cs.fontFamily.split(",")[0].replace(/["']/g, "");
+      lines.push(
+        `${family} ${cs.fontWeight} · ${px(cs.fontSize)}/${px(cs.lineHeight) || "normal"}`,
+        `<span class="xray-swatch" style="background:${cs.color}"></span>${toHex(cs.color)}`,
+      );
+    }
+    if (owner && !h.dataset.xray) lines.push(`<span class="xray-dim">in &lt;${owner} /&gt;</span>`);
+    return lines.join("<br>");
+  };
+
+  const drawInspector = () => {
+    raf = 0;
+    if (!layer) return;
+    const [, margin, box, tip] = layer.children as unknown as HTMLDivElement[];
+    if (!hovered || !hovered.isConnected) {
+      margin.style.display = box.style.display = tip.style.display = "none";
+      return;
+    }
+    const cs = getComputedStyle(hovered);
+    const r = hovered.getBoundingClientRect();
+    const m = [cs.marginTop, cs.marginRight, cs.marginBottom, cs.marginLeft].map(px);
+
+    Object.assign(box.style, {
+      display: "block",
+      top: `${r.top}px`,
+      left: `${r.left}px`,
+      width: `${r.width}px`,
+      height: `${r.height}px`,
+      borderWidth: `${px(cs.paddingTop)}px ${px(cs.paddingRight)}px ${px(cs.paddingBottom)}px ${px(cs.paddingLeft)}px`,
+    });
+    Object.assign(margin.style, {
+      display: "block",
+      top: `${r.top - Math.max(m[0], 0)}px`,
+      left: `${r.left - Math.max(m[3], 0)}px`,
+      width: `${r.width + Math.max(m[1], 0) + Math.max(m[3], 0)}px`,
+      height: `${r.height + Math.max(m[0], 0) + Math.max(m[2], 0)}px`,
+      borderWidth: m.map((v) => `${Math.max(v, 0)}px`).join(" "),
+    });
+
+    tip.innerHTML = describe(hovered);
+    tip.style.display = "block";
+    const tw = tip.offsetWidth;
+    const th = tip.offsetHeight;
+    let top = r.top - th - 8;
+    if (top < 8) top = Math.min(r.bottom + 8, innerHeight - th - 8);
+    const left = Math.min(Math.max(r.left, 8), innerWidth - tw - 8);
+    tip.style.top = `${Math.max(top, 8)}px`;
+    tip.style.left = `${left}px`;
+  };
+
+  const schedule = () => {
+    if (!raf) raf = requestAnimationFrame(drawInspector);
+  };
+
+  const onMove = (e: PointerEvent) => {
+    const t = e.target as Element;
+    hovered = t === document.documentElement || t === document.body ? null : t;
+    schedule();
+  };
+  const onLeave = () => {
+    hovered = null;
+    schedule();
+  };
+  const onResize = () => {
+    updateViewport();
+    schedule();
+  };
+
+  const setButtons = () =>
+    document
+      .querySelectorAll("[data-xray-toggle]")
+      .forEach((b) => b.setAttribute("aria-pressed", String(enabled)));
+
+  const enable = () => {
+    if (enabled) return;
+    enabled = true;
+    root.classList.add("xray");
+    build();
+    document.addEventListener("pointermove", onMove, { passive: true });
+    document.addEventListener("pointerleave", onLeave);
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", onResize);
+    setButtons();
+  };
+
+  const disable = () => {
+    if (!enabled) return;
+    enabled = false;
+    root.classList.remove("xray");
+    layer?.remove();
+    layer = null;
+    hovered = null;
+    cancelAnimationFrame(raf);
+    raf = 0;
+    document.removeEventListener("pointermove", onMove);
+    document.removeEventListener("pointerleave", onLeave);
+    window.removeEventListener("scroll", schedule);
+    window.removeEventListener("resize", onResize);
+    setButtons();
+  };
+
+  const toggle = () => (enabled ? disable() : enable());
+
+  // Delegated so it keeps working after view transitions swap the page
+  document.addEventListener("click", (e) => {
+    if ((e.target as Element).closest("[data-xray-toggle]")) toggle();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    const typing = (e.target as Element).closest(
+      "input, textarea, select, [contenteditable]",
+    );
+    if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.shiftKey && e.key.toLowerCase() === "x") toggle();
+    else if (e.key === "Escape" && enabled && !document.querySelector("dialog[open]"))
+      disable();
+  });
+
+  // Stay on across page navigations (view transitions replace the body)
+  document.addEventListener("astro:after-swap", () => {
+    if (!enabled) return setButtons();
+    root.classList.add("xray");
+    layer = null;
+    build();
+    setButtons();
+  });
+</script>
+
+<style is:global>
+  /* ---------- X-ray mode (see XRay.astro) ---------- */
+  .xray [data-xray] {
+    outline: 1px dashed rgb(var(--accent-text) / 0.55);
+    outline-offset: -1px;
+  }
+
+  /* Labels need a positioned parent; leave sticky/fixed/absolute alone */
+  .xray [data-xray]:not(.sticky):not(.fixed):not(.absolute) {
+    position: relative;
+  }
+
+  .xray [data-xray]::before {
+    content: "<" attr(data-xray) " />";
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 55;
+    padding: 1px 6px;
+    font: 500 10px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+    letter-spacing: 0;
+    text-transform: none;
+    color: #fff;
+    background: rgb(var(--accent-text));
+    pointer-events: none;
+  }
+
+  .xray-col {
+    position: relative;
+    height: 100%;
+    background: rgb(var(--accent-text) / 0.05);
+    border-inline: 1px solid rgb(var(--accent-text) / 0.18);
+  }
+
+  .xray-col span {
+    position: absolute;
+    bottom: 0.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font: 500 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: rgb(var(--accent-text) / 0.7);
+  }
+
+  .xray-box,
+  .xray-margin {
+    position: fixed;
+    display: none;
+    z-index: 61;
+    pointer-events: none;
+    box-sizing: border-box;
+    border-style: solid;
+  }
+
+  /* Padding shows as the tinted border of the element's own box */
+  .xray-box {
+    border-color: rgb(var(--accent-text) / 0.14);
+    outline: 1px solid rgb(var(--accent-text));
+  }
+
+  .xray-margin {
+    border-color: rgb(245 158 11 / 0.14);
+  }
+
+  .xray-tip,
+  .xray-hud {
+    position: fixed;
+    z-index: 62;
+    pointer-events: none;
+    font: 400 11px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: rgb(var(--paper));
+    background: rgb(var(--ink) / 0.92);
+    backdrop-filter: blur(8px);
+  }
+
+  .xray-tip {
+    display: none;
+    max-width: min(320px, calc(100vw - 16px));
+    padding: 6px 10px;
+  }
+
+  .xray-tip strong {
+    font-weight: 600;
+  }
+
+  .xray-dim {
+    opacity: 0.6;
+  }
+
+  .xray-swatch {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-right: 6px;
+    vertical-align: middle;
+    outline: 1px solid rgb(var(--paper) / 0.4);
+  }
+
+  .xray-hud {
+    left: 16px;
+    bottom: 16px;
+    width: 270px;
+    padding: 12px 14px;
+    animation: xray-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .xray-hud-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .xray-hud dl div {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .xray-hud dt {
+    opacity: 0.6;
+  }
+
+  .xray-hud-hint {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgb(var(--paper) / 0.15);
+    opacity: 0.6;
+  }
+
+  .xray-hud kbd {
+    font: inherit;
+  }
+
+  @keyframes xray-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .xray-hud {
+      animation: none;
+    }
+  }
+</style>

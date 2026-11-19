@@ -21,7 +21,7 @@ const {
 const itemDelay = (i: number) => delay + Math.min(i * 25, 600);
 ---
 
-<div class:list={[className]} {...rest}>
+<div data-xray="SkillsGrid" class:list={[className]} {...rest}>
   <div
     class="flex items-center gap-4 border-t border-line pt-5"
     data-reveal="up"
