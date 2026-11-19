@@ -1,15 +1,15 @@
 ---
 import { sanityClient } from "sanity:client";
 import { getProfile } from "../sanity/useSanityHelper";
-import SanityImage from "../components/SanityImage.astro";
+import { Image } from "astro:assets";
+import portrait from "../assets/portfolio-image.jpg";
 import SkillsGrid from "./SkillsGrid.astro";
 import SkillsMarquee from "./SkillsMarquee.astro";
 import FoldedPaper from "./FoldedPaper.astro";
 import { getHighlights, splitBio } from "../data/profile";
 
 const profile = await getProfile();
-const { name, bio, contactEmail, skills, resume, profilePicture, jobRole } =
-  profile;
+const { name, bio, contactEmail, skills, resume, jobRole } = profile;
 const cv = await sanityClient.getDocument(resume.asset._ref);
 
 // First word on line one, the rest indented on line two
@@ -140,11 +140,24 @@ const { lead: bioLead, rest: bioRest } = splitBio(bio);
         data-reveal="image"
         style="--reveal-delay: 200ms"
       >
-        <SanityImage
-          classes="aspect-[4/5] w-full object-cover"
-          node={profilePicture}
-          width="800"
+        <!-- Hardcoded portrait (src/assets/portfolio-image.jpg), optimised by Astro.
+             The landscape photo is cropped into a 4:5 frame, so it's drawn
+             ~1.67x wider than the frame: `sizes` accounts for that. -->
+        <Image
+          src={portrait}
+          alt={`Portrait of ${name}`}
+          widths={[600, 800, 1200, 1600]}
+          sizes="(min-width: 1024px) 47rem, 167vw"
+          loading="eager"
+          class="aspect-[4/5] w-full object-cover"
         />
+        <!-- Dark mode: a slate colour blend tints the black-and-white photo
+             to match the palette -->
+        <div
+          class="pointer-events-none absolute inset-0 hidden bg-slate-700 mix-blend-color dark:block"
+          aria-hidden="true"
+        >
+        </div>
       </div>
     </div>
   </div>
