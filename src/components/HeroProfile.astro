@@ -4,6 +4,7 @@ import { getProfile } from "../sanity/useSanityHelper";
 import SanityImage from "../components/SanityImage.astro";
 import SkillsGrid from "./SkillsGrid.astro";
 import SkillsMarquee from "./SkillsMarquee.astro";
+import { getHighlights, splitBio } from "../data/profile";
 
 const profile = await getProfile();
 const { name, bio, contactEmail, skills, resume, profilePicture, jobRole } =
@@ -14,21 +15,8 @@ const cv = await sanityClient.getDocument(resume.asset._ref);
 const [firstName, ...rest] = name.trim().split(/\s+/);
 const lastName = rest.join(" ");
 
-// Focus areas shown in a row beneath the job role. `short` is used on
-// small screens so the row stays on one line. Uses `highlights` from the
-// Sanity profile if present (same text at every size), otherwise these defaults.
-const highlights: { full: string; short: string }[] = profile.highlights?.length
-  ? profile.highlights.slice(0, 3).map((h: string) => ({ full: h, short: h }))
-  : [
-      { full: "Front end specialist", short: "Front end" },
-      { full: "AI Product Engineer", short: "AI product" },
-      { full: "Performance & accessibility", short: "Performance" },
-    ];
-
-// Lead sentence of the bio is emphasised, the rest is supporting copy
-const bioMatch = bio?.trim().match(/^(.+?[.!?])\s+([\s\S]+)$/);
-const bioLead = bioMatch ? bioMatch[1] : bio;
-const bioRest = bioMatch ? bioMatch[2] : "";
+const highlights = getHighlights(profile);
+const { lead: bioLead, rest: bioRest } = splitBio(bio);
 ---
 
 <section
