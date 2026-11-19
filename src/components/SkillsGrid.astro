@@ -1,0 +1,59 @@
+---
+// Skills shown as a static, scannable index grid. Data comes straight from
+// the Sanity profile `skills` array passed in as `items`.
+interface Props {
+  items: string[];
+  label?: string;
+  /** Base reveal delay in ms; each skill then staggers in after it */
+  delay?: number;
+  [key: string]: any;
+}
+
+const {
+  items = [],
+  label = "Skills",
+  delay = 0,
+  class: className,
+  ...rest
+} = Astro.props;
+
+// Quick cascade: 25ms between skills, capped so the tail never lags
+const itemDelay = (i: number) => delay + Math.min(i * 25, 600);
+---
+
+<div class:list={[className]} {...rest}>
+  <div
+    class="flex items-center gap-4 border-t border-line pt-5"
+    data-reveal="up"
+    style={`--reveal-delay: ${delay}ms`}
+  >
+    <span class="eyebrow">
+      <span class="marker" aria-hidden="true"></span>{label}
+    </span>
+  </div>
+
+  <ul
+    class="mt-4 grid grid-cols-2 gap-x-6 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-8 xl:grid-cols-6"
+    aria-label="Skills"
+  >
+    {
+      items.map((item, i) => (
+        <li
+          class="border-b border-line"
+          data-reveal="up"
+          style={`--reveal-delay: ${itemDelay(i)}ms`}
+        >
+          <div class="group flex items-center gap-2.5 py-2.5 text-sm text-ink/80 transition-colors duration-300 hover:text-ink lg:py-3">
+            <span
+              class="marker scale-0 transition-transform duration-300 group-hover:scale-100"
+              aria-hidden="true"
+            />
+            <span class="-translate-x-4 truncate transition-transform duration-300 group-hover:translate-x-0">
+              {item}
+            </span>
+          </div>
+        </li>
+      ))
+    }
+  </ul>
+</div>
