@@ -31,7 +31,17 @@ const year = new Date().getFullYear();
     class="container flex flex-col gap-4 border-t border-line py-6 text-sm text-muted sm:flex-row sm:items-center sm:justify-between"
   >
     <span>&copy; {year} {name}</span>
-    <div class="flex items-center gap-6">
+    <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
+      <button
+        type="button"
+        data-design-open
+        aria-haspopup="dialog"
+        aria-expanded="false"
+        aria-controls="design-system"
+        class="link-underline hover:text-ink"
+      >
+        Design system
+      </button>
       <a
         href="https://www.linkedin.com/in/jonathan-oliver-92056496/?originalSubdomain=uk"
         target="_blank"

@@ -153,35 +153,4 @@ const { lead: bioLead, rest: bioRest } = splitBio(bio);
     />
     <SkillsGrid items={skills} delay={400} />
   </div>
-
-  <a
-    href="#work"
-    class="eyebrow group hidden items-center gap-3 self-start transition-colors hover:text-ink lg:inline-flex"
-  >
-    <span class="relative block h-8 w-px overflow-hidden bg-line">
-      <span class="scroll-line absolute inset-x-0 top-0 h-1/2 bg-ink"></span>
-    </span>
-    Scroll
-  </a>
 </section>
-
-<style>
-  .scroll-line {
-    animation: scroll-line 2.4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
-  }
-
-  @keyframes scroll-line {
-    from {
-      transform: translateY(-100%);
-    }
-    to {
-      transform: translateY(200%);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .scroll-line {
-      animation: none;
-    }
-  }
-</style>
