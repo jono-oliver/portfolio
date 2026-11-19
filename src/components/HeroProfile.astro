@@ -4,6 +4,7 @@ import { getProfile } from "../sanity/useSanityHelper";
 import SanityImage from "../components/SanityImage.astro";
 import SkillsGrid from "./SkillsGrid.astro";
 import SkillsMarquee from "./SkillsMarquee.astro";
+import FoldedPaper from "./FoldedPaper.astro";
 import { getHighlights, splitBio } from "../data/profile";
 
 const profile = await getProfile();
@@ -18,6 +19,9 @@ const lastName = rest.join(" ");
 const highlights = getHighlights(profile);
 const { lead: bioLead, rest: bioRest } = splitBio(bio);
 ---
+
+<div class="relative isolate overflow-hidden">
+<FoldedPaper />
 
 <section data-xray="HeroProfile"
   class="container flex min-h-[calc(100svh-4rem)] flex-col justify-between gap-12 pb-10 pt-10 lg:min-h-[calc(100svh-5rem)] lg:pt-16"
@@ -153,35 +157,5 @@ const { lead: bioLead, rest: bioRest } = splitBio(bio);
     />
     <SkillsGrid items={skills} delay={400} />
   </div>
-
-  <a
-    href="#work"
-    class="eyebrow group hidden items-center gap-3 self-start transition-colors hover:text-ink lg:inline-flex"
-  >
-    <span class="relative block h-8 w-px overflow-hidden bg-line">
-      <span class="scroll-line absolute inset-x-0 top-0 h-1/2 bg-ink"></span>
-    </span>
-    Scroll
-  </a>
 </section>
-
-<style>
-  .scroll-line {
-    animation: scroll-line 2.4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
-  }
-
-  @keyframes scroll-line {
-    from {
-      transform: translateY(-100%);
-    }
-    to {
-      transform: translateY(200%);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .scroll-line {
-      animation: none;
-    }
-  }
-</style>
+</div>

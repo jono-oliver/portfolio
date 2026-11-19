@@ -1,0 +1,677 @@
+---
+// Design System panel: a drawer that slides in from the right and explains
+// the site's colour palette, typography, layout and motion, using the real
+// tokens and classes so every example is live.
+// Opened by any [data-design-open] button (X-ray HUD, footer), Shift+D, or a
+// URL ending in #design-system. Copy lives in src/data/designSystem.ts.
+import {
+  intro,
+  colours,
+  colourRationale,
+  contrastPairs,
+  fonts,
+  typeScale,
+  typeRationale,
+  breakpoints,
+  spacing,
+  layoutRationale,
+  motion,
+  motifs,
+} from "../data/designSystem";
+
+const tabs = [
+  { id: "ds-colour", label: "Colour" },
+  { id: "ds-type", label: "Type" },
+  { id: "ds-layout", label: "Layout" },
+  { id: "ds-motion", label: "Motion" },
+];
+const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789";
+const weightNames: Record<number, string> = { 400: "Regular", 500: "Medium", 700: "Bold" };
+const [x1, y1, x2, y2] = motion.bezier;
+// Easing curve in a 100×100 box, y flipped for SVG
+const curve = `M0 100 C${x1 * 100} ${100 - y1 * 100} ${x2 * 100} ${100 - y2 * 100} 100 0`;
+---
+
+<dialog
+  id="design-system"
+  data-design-panel
+  aria-labelledby="ds-title"
+  class="ds m-0 ml-auto h-[100dvh] max-h-[100dvh] w-full max-w-full bg-paper p-0 text-ink backdrop:bg-ink/30 backdrop:backdrop-blur-sm sm:w-[520px] sm:border-l sm:border-line"
+>
+  <div class="flex h-full flex-col">
+    <!-- Header -->
+    <div class="shrink-0 border-b border-line bg-paper">
+      <div class="flex items-center justify-between gap-4 px-5 py-4 sm:px-7">
+        <span class="eyebrow">
+          <span class="marker" aria-hidden="true"></span>Design system
+        </span>
+        <button
+          type="button"
+          data-design-close
+          class="grid h-9 w-9 place-items-center rounded-full border border-line transition-colors duration-300 hover:border-ink"
+          aria-label="Close design system"
+        >
+          <svg class="h-3.5 w-3.5" viewBox="0 0 14 14" aria-hidden="true">
+            <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.5" fill="none"></path>
+          </svg>
+        </button>
+      </div>
+      <nav class="flex gap-6 overflow-x-auto px-5 text-sm sm:px-7" aria-label="Design system sections">
+        {
+          tabs.map((t) => (
+            <a href={`#${t.id}`} data-ds-tab class="link-underline mb-3 shrink-0 text-muted transition-colors hover:text-ink">
+              {t.label}
+            </a>
+          ))
+        }
+      </nav>
+    </div>
+
+    <!-- Body -->
+    <div class="ds-body flex-1 overflow-y-auto overscroll-contain px-5 pb-16 outline-none sm:px-7" data-ds-scroll tabindex="-1" autofocus>
+      <header class="border-b border-line py-8">
+        <h2 id="ds-title" class="text-4xl font-bold uppercase leading-[0.95] tracking-[-0.03em]">
+          How it's<br />designed<span class="text-accent-text">.</span>
+        </h2>
+        <p class="mt-4 leading-relaxed text-muted">{intro}</p>
+      </header>
+
+      <!-- Colour -->
+      <section id="ds-colour" class="scroll-mt-4 border-b border-line py-8" aria-labelledby="ds-colour-h">
+        <div class="flex items-center justify-between gap-4">
+          <h3 id="ds-colour-h" class="eyebrow"><span class="marker" aria-hidden="true"></span>Colour palette</h3>
+          <button type="button" data-theme-toggle class="link-underline text-xs font-medium">
+            Switch theme
+          </button>
+        </div>
+
+        <ul class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {
+            colours.map((c) => (
+              <li>
+                <div class="aspect-[4/3] border border-line" style={`background: rgb(var(--${c.token}))`} />
+                <p class="mt-2 text-sm font-medium">{c.name}</p>
+                <p class="font-mono text-xs text-muted">
+                  <span data-hex={c.token}>—</span> · --{c.token}
+                </p>
+                <p class="mt-1 text-xs leading-snug text-muted">{c.role}</p>
+                <p class="mt-1 font-mono text-[10px] text-muted">
+                  <span class="dark:opacity-50">{c.light}</span> / <span class="opacity-50 dark:opacity-100">{c.dark}</span>
+                </p>
+              </li>
+            ))
+          }
+        </ul>
+
+        <div class="mt-6">
+          <p class="text-xs font-medium text-muted">Contrast on paper (WCAG)</p>
+          <ul class="mt-2 divide-y divide-line border-y border-line">
+            {
+              contrastPairs.map((p) => (
+                <li class="flex items-center justify-between gap-3 py-2.5 text-sm">
+                  <span class="flex items-center gap-3">
+                    <span class="grid h-7 w-7 place-items-center border border-line text-xs font-bold" style={`background: rgb(var(--${p.bg})); color: rgb(var(--${p.fg}))`}>
+                      Aa
+                    </span>
+                    {p.label}
+                  </span>
+                  <span class="flex items-center gap-2 font-mono text-xs">
+                    <span data-contrast={p.fg} data-contrast-bg={p.bg}>—</span>
+                    <span data-contrast-badge={p.fg} class="rounded-full border border-line px-2 py-0.5" />
+                  </span>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+
+        <div class="mt-6 space-y-3 text-sm leading-relaxed text-muted">
+          {colourRationale.map((p) => <p>{p}</p>)}
+        </div>
+      </section>
+
+      <!-- Typography -->
+      <section id="ds-type" class="scroll-mt-4 border-b border-line py-8" aria-labelledby="ds-type-h">
+        <h3 id="ds-type-h" class="eyebrow"><span class="marker" aria-hidden="true"></span>Typography</h3>
+
+        <div class="mt-5 grid gap-3">
+          {
+            fonts.map((f) => (
+              <article class="border border-line p-5">
+                <div class="flex items-start justify-between gap-4">
+                  <div>
+                    <p class:list={[f.css, "text-6xl font-bold leading-none"]}>Aa</p>
+                    <p class:list={[f.css, "mt-3 text-xl font-medium"]}>{f.family}</p>
+                    <p class="text-xs text-muted">{f.role}</p>
+                  </div>
+                  <ul class="text-right text-sm">
+                    {f.weights.map((w) => (
+                      <li class={f.css} style={`font-weight: ${w}`}>
+                        {weightNames[w]} {w}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <p class:list={[f.css, "mt-4 break-words text-sm leading-relaxed text-muted"]}>{alphabet}</p>
+                <p class="mt-4 text-sm leading-relaxed">{f.rationale}</p>
+              </article>
+            ))
+          }
+        </div>
+
+        <p class="mt-6 text-xs font-medium text-muted">Type scale</p>
+        <ul class="mt-2 divide-y divide-line border-y border-line">
+          {
+            typeScale.map((t) => (
+              <li class="py-3">
+                <div class="flex items-baseline justify-between gap-3 font-mono text-[11px] text-muted">
+                  <span>{t.name} · {t.token}</span>
+                  <span class="text-right">{t.value}</span>
+                </div>
+                <p
+                  class:list={[
+                    "mt-1 truncate",
+                    t.heading && "font-heading font-bold uppercase leading-none tracking-[-0.03em]",
+                    t.eyebrow && "eyebrow",
+                  ]}
+                  style={`font-size: ${t.px}px`}
+                >
+                  {t.eyebrow && <span class="marker" aria-hidden="true" />}
+                  {t.sample}
+                </p>
+              </li>
+            ))
+          }
+        </ul>
+        <p class="mt-5 text-sm leading-relaxed text-muted">{typeRationale}</p>
+      </section>
+
+      <!-- Layout -->
+      <section id="ds-layout" class="scroll-mt-4 border-b border-line py-8" aria-labelledby="ds-layout-h">
+        <h3 id="ds-layout-h" class="eyebrow"><span class="marker" aria-hidden="true"></span>Layout & spacing</h3>
+
+        <div class="mt-5 grid h-20 grid-cols-12 gap-1" aria-hidden="true">
+          {Array.from({ length: 12 }, (_, i) => (
+            <div class="flex items-end justify-center bg-accent-text/10 pb-1 font-mono text-[9px] text-accent-text">{i + 1}</div>
+          ))}
+        </div>
+        <p class="mt-2 text-xs text-muted">12-column grid, 2rem gutters on large screens</p>
+
+        <table class="mt-6 w-full text-left text-sm">
+          <caption class="mb-2 text-left text-xs font-medium text-muted">
+            Breakpoints · you're on <span data-ds-bp class="text-ink">—</span>
+          </caption>
+          <thead class="font-mono text-[11px] text-muted">
+            <tr class="border-b border-line">
+              <th class="py-2 font-normal">Name</th>
+              <th class="py-2 font-normal">Min width</th>
+              <th class="py-2 text-right font-normal">Side padding</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              breakpoints.map((b) => (
+                <tr data-bp-row={b.name} data-bp-min={b.min} class="border-b border-line transition-colors">
+                  <td class="py-2 font-medium">
+                    <span class="flex items-center gap-2">
+                      <span class="marker opacity-0" data-bp-marker aria-hidden="true" />
+                      {b.name}
+                    </span>
+                  </td>
+                  <td class="py-2 font-mono text-xs text-muted">{b.width}</td>
+                  <td class="py-2 text-right font-mono text-xs text-muted">{b.padding}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+
+        <p class="mt-6 text-xs font-medium text-muted">Spacing scale (px)</p>
+        <ul class="mt-2 space-y-1.5" aria-label="Spacing scale">
+          {
+            spacing.map((s) => (
+              <li class="flex items-center gap-3">
+                <span class="w-8 shrink-0 text-right font-mono text-[11px] text-muted">{s}</span>
+                <span class="block h-2 bg-ink/80" style={`width: ${(s / 128) * 100}%; max-width: ${s * 2}px`} />
+              </li>
+            ))
+          }
+        </ul>
+
+        <p class="mt-6 text-sm leading-relaxed text-muted">{layoutRationale}</p>
+        <button type="button" data-ds-xray class="group mt-5 hidden items-center gap-2 text-sm font-medium md:inline-flex">
+          <span class="link-underline">See it on the page with X-ray</span>
+          <span class="arrow" aria-hidden="true">&rarr;</span>
+        </button>
+      </section>
+
+      <!-- Motion -->
+      <section id="ds-motion" class="scroll-mt-4 py-8" aria-labelledby="ds-motion-h">
+        <div class="flex items-center justify-between gap-4">
+          <h3 id="ds-motion-h" class="eyebrow"><span class="marker" aria-hidden="true"></span>Motion & motifs</h3>
+          <button type="button" data-ds-replay class="link-underline text-xs font-medium">Replay</button>
+        </div>
+
+        <div class="mt-5 grid gap-3 sm:grid-cols-2">
+          <!-- Easing curve with a dot tracing it: x moves linearly, y follows the easing -->
+          <figure class="border border-line p-4">
+            <div class="relative aspect-square">
+              <svg viewBox="-2 -2 104 104" class="absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
+                <path d="M0 100H100M0 100V0" stroke="rgb(var(--line))" fill="none" />
+                <path d={curve} stroke="rgb(var(--accent-text))" stroke-width="1.5" fill="none" vector-effect="non-scaling-stroke" />
+              </svg>
+              <div class="ds-anim ds-track-x absolute inset-0">
+                <div class="ds-anim ds-track-y absolute inset-0" style={`--ease: ${motion.easing}`}>
+                  <span class="ds-dot marker absolute" />
+                </div>
+              </div>
+            </div>
+            <figcaption class="mt-3 font-mono text-[11px] text-muted">ease-out-expo · {motion.easing}</figcaption>
+          </figure>
+
+          <!-- Same move, linear vs ease-out-expo -->
+          <figure class="flex flex-col justify-center gap-4 border border-line p-4">
+            <div>
+              <p class="mb-1 font-mono text-[11px] text-muted">linear</p>
+              <div class="relative h-4 border-b border-line">
+                <span class="ds-anim ds-slide marker absolute bottom-1 left-0" style="--ease: linear" />
+              </div>
+            </div>
+            <div>
+              <p class="mb-1 font-mono text-[11px] text-muted">ease-out-expo</p>
+              <div class="relative h-4 border-b border-line">
+                <span class="ds-anim ds-slide marker absolute bottom-1 left-0" style={`--ease: ${motion.easing}`} />
+              </div>
+            </div>
+            <figcaption class="font-mono text-[11px] text-muted">Same 1s move, different feel</figcaption>
+          </figure>
+        </div>
+
+        <ul class="mt-4 flex flex-wrap gap-2" aria-label="Durations">
+          {
+            motion.durations.map((d) => (
+              <li class="rounded-full border border-line px-3 py-1 text-xs">
+                <span class="font-mono">{d.ms}ms</span> <span class="text-muted">· {d.use}</span>
+              </li>
+            ))
+          }
+        </ul>
+
+        <!-- The site's real reveal animations, replayable -->
+        <div class="mt-4 grid grid-cols-2 gap-3">
+          <div class="overflow-hidden border border-line p-4">
+            <p class="font-mono text-[11px] text-muted">data-reveal="up"</p>
+            <p data-reveal="up" data-ds-reveal class="mt-3 text-sm font-medium">Fades up into place</p>
+          </div>
+          <div class="overflow-hidden border border-line p-4">
+            <p class="font-mono text-[11px] text-muted">data-reveal="mask"</p>
+            <p class="mt-3 font-heading text-xl font-bold uppercase leading-none tracking-tight">
+              <span data-reveal="mask" data-ds-reveal><span>Rises</span></span>
+            </p>
+          </div>
+        </div>
+
+        <p class="mt-6 text-xs font-medium text-muted">Signature motifs · hover to try</p>
+        <ul class="mt-2 divide-y divide-line border-y border-line">
+          {
+            motifs.map((m, i) => (
+              <li class="flex items-center gap-4 py-3">
+                <span class="grid h-12 w-24 shrink-0 place-items-center border border-line">
+                  {i === 0 && <span class="marker scale-[2]" />}
+                  {i === 1 && <span class="eyebrow text-[9px]"><span class="marker" />Intro</span>}
+                  {i === 2 && <span class="link-underline cursor-default text-sm" tabindex="0">Hover</span>}
+                  {i === 3 && (
+                    <span class="group inline-flex cursor-default items-center gap-1 text-sm" tabindex="0">
+                      Hover <span class="arrow">&rarr;</span>
+                    </span>
+                  )}
+                  {i === 4 && <span class="ds-grain block h-full w-full" />}
+                </span>
+                <span>
+                  <span class="block text-sm font-medium">{m.name}</span>
+                  <span class="block text-xs leading-snug text-muted">{m.note}</span>
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+
+        <p class="mt-6 text-sm leading-relaxed text-muted">{motion.rationale}</p>
+      </section>
+    </div>
+  </div>
+</dialog>
+
+<script>
+  const HASH = "#design-system";
+  const reduceMotion = () =>
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const getPanel = () =>
+    document.querySelector<HTMLDialogElement>("dialog[data-design-panel]");
+
+  // ---- Live values: hex, contrast, current breakpoint ----
+  const rgbOf = (token: string) =>
+    getComputedStyle(document.documentElement)
+      .getPropertyValue(`--${token}`)
+      .trim()
+      .split(/\s+/)
+      .map(Number);
+
+  const hex = (rgb: number[]) =>
+    "#" + rgb.map((n) => n.toString(16).padStart(2, "0")).join("").toUpperCase();
+
+  const luminance = (rgb: number[]) => {
+    const [r, g, b] = rgb.map((v) => {
+      const c = v / 255;
+      return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+
+  const contrast = (a: number[], b: number[]) => {
+    const [l1, l2] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+    return (l1 + 0.05) / (l2 + 0.05);
+  };
+
+  const grade = (ratio: number) =>
+    ratio >= 7 ? "AAA" : ratio >= 4.5 ? "AA" : ratio >= 3 ? "AA large" : "Fail";
+
+  const refreshColours = (panel: HTMLElement) => {
+    panel.querySelectorAll<HTMLElement>("[data-hex]").forEach((el) => {
+      const rgb = rgbOf(el.dataset.hex!);
+      if (rgb.length === 3) el.textContent = hex(rgb);
+    });
+    panel.querySelectorAll<HTMLElement>("[data-contrast]").forEach((el) => {
+      const ratio = contrast(rgbOf(el.dataset.contrast!), rgbOf(el.dataset.contrastBg!));
+      el.textContent = `${ratio.toFixed(1)}:1`;
+      const badge = panel.querySelector<HTMLElement>(`[data-contrast-badge="${el.dataset.contrast}"]`);
+      if (badge) {
+        badge.textContent = grade(ratio);
+        badge.classList.toggle("text-muted", ratio < 4.5);
+      }
+    });
+  };
+
+  const refreshBreakpoint = (panel: HTMLElement) => {
+    const rows = [...panel.querySelectorAll<HTMLElement>("[data-bp-row]")];
+    const current = rows.filter((r) => innerWidth >= Number(r.dataset.bpMin)).pop();
+    rows.forEach((r) => {
+      const on = r === current;
+      r.classList.toggle("bg-accent-text/5", on);
+      r.querySelector("[data-bp-marker]")?.classList.toggle("opacity-0", !on);
+    });
+    const label = panel.querySelector("[data-ds-bp]");
+    if (label && current) label.textContent = `${current.dataset.bpRow} (${innerWidth}px)`;
+  };
+
+  // ---- Demos ----
+  const replay = (panel: HTMLElement) => {
+    panel.querySelectorAll(".ds-anim").forEach((el) => {
+      el.classList.remove("is-playing");
+      void (el as HTMLElement).offsetWidth; // restart CSS animation
+      el.classList.add("is-playing");
+    });
+    panel.querySelectorAll("[data-ds-reveal]").forEach((el) => {
+      el.classList.remove("is-visible");
+      void (el as HTMLElement).offsetWidth;
+      setTimeout(() => el.classList.add("is-visible"), 60);
+    });
+  };
+
+  // ---- Open / close ----
+  let themeObserver: MutationObserver | null = null;
+  const onResize = () => {
+    const panel = getPanel();
+    if (panel) refreshBreakpoint(panel);
+  };
+
+  const setExpanded = (open: boolean) =>
+    document
+      .querySelectorAll("[data-design-open]")
+      .forEach((b) => b.setAttribute("aria-expanded", String(open)));
+
+  const open = () => {
+    const panel = getPanel();
+    if (!panel || panel.open) return;
+    panel.classList.remove("is-closing");
+    panel.showModal();
+    document.documentElement.classList.add("overflow-hidden");
+    setExpanded(true);
+    if (location.hash !== HASH) history.replaceState(null, "", HASH);
+
+    refreshColours(panel);
+    refreshBreakpoint(panel);
+    // Let the slide-in finish before the demos play
+    setTimeout(() => replay(panel), reduceMotion() ? 0 : 500);
+
+    themeObserver = new MutationObserver(() => refreshColours(panel));
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    window.addEventListener("resize", onResize);
+  };
+
+  const close = () => {
+    const panel = getPanel();
+    if (!panel?.open || panel.classList.contains("is-closing")) return;
+    if (reduceMotion()) return panel.close();
+
+    panel.classList.add("is-closing");
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      panel.classList.remove("is-closing");
+      panel.close();
+    };
+    panel.addEventListener(
+      "animationend",
+      function onEnd(e) {
+        if (e.target !== panel) return; // ignore demo animations inside
+        panel.removeEventListener("animationend", onEnd);
+        finish();
+      },
+    );
+    setTimeout(finish, 600); // safety net
+  };
+
+  const toggle = () => (getPanel()?.open ? close() : open());
+
+  // Delegated so it keeps working after view transitions swap the page
+  document.addEventListener("click", (e) => {
+    const target = e.target as Element;
+    const panel = getPanel();
+
+    if (target.closest("[data-design-open]")) return open();
+    if (target.closest("[data-design-close]")) return close();
+    if (!panel?.open) return;
+
+    if (target.closest("[data-ds-replay]")) return replay(panel);
+
+    if (target.closest("[data-ds-xray]")) {
+      close();
+      document.dispatchEvent(new CustomEvent("xray:enable"));
+      return;
+    }
+
+    // Section tabs scroll inside the panel instead of changing the URL hash
+    const tab = target.closest<HTMLAnchorElement>("[data-ds-tab]");
+    if (tab) {
+      e.preventDefault();
+      panel
+        .querySelector(tab.getAttribute("href")!)
+        ?.scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth" });
+      return;
+    }
+
+    // Click on the backdrop (outside the drawer) closes it
+    if (target === panel) {
+      const r = panel.getBoundingClientRect();
+      const { clientX: x, clientY: y } = e as MouseEvent;
+      if (x < r.left || x > r.right || y < r.top || y > r.bottom) close();
+    }
+  });
+
+  // Esc: animate out instead of closing instantly
+  document.addEventListener(
+    "cancel",
+    (e) => {
+      if (!(e.target as Element).matches?.("dialog[data-design-panel]")) return;
+      e.preventDefault();
+      close();
+    },
+    true,
+  );
+
+  // Cleanup however it closed
+  document.addEventListener(
+    "close",
+    (e) => {
+      if (!(e.target as Element).matches?.("dialog[data-design-panel]")) return;
+      document.documentElement.classList.remove("overflow-hidden");
+      setExpanded(false);
+      themeObserver?.disconnect();
+      themeObserver = null;
+      window.removeEventListener("resize", onResize);
+      if (location.hash === HASH)
+        history.replaceState(null, "", location.pathname + location.search);
+    },
+    true,
+  );
+
+  // Shift+D toggles (not while typing or with another dialog open)
+  document.addEventListener("keydown", (e) => {
+    if (!e.shiftKey || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key.toLowerCase() !== "d") return;
+    if ((e.target as Element).closest("input, textarea, select, [contenteditable]")) return;
+    const other = document.querySelector("dialog[open]:not([data-design-panel])");
+    if (other) return;
+    e.preventDefault();
+    toggle();
+  });
+
+  document.addEventListener("design:open", open);
+  document.addEventListener("astro:page-load", () => {
+    if (location.hash === HASH) open();
+  });
+  window.addEventListener("hashchange", () => {
+    if (location.hash === HASH) open();
+  });
+</script>
+
+<style>
+  /* The scroll area takes focus on open (so arrow keys scroll it);
+     it isn't a control, so it shouldn't show a focus ring */
+  .ds-body:focus-visible {
+    outline: none;
+  }
+
+  /* Drawer slide */
+  .ds[open] {
+    animation: ds-in 0.7s var(--ease-out-expo);
+  }
+  .ds[open]::backdrop {
+    animation: ds-fade-in 0.5s ease-out;
+  }
+  .ds.is-closing {
+    animation: ds-out 0.45s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+  }
+  .ds.is-closing::backdrop {
+    animation: ds-fade-out 0.45s ease-in forwards;
+  }
+  .ds[open] .ds-body {
+    animation: ds-body-in 0.8s 0.15s var(--ease-out-expo) both;
+  }
+
+  @keyframes ds-in {
+    from {
+      transform: translateX(100%);
+    }
+  }
+  @keyframes ds-out {
+    to {
+      transform: translateX(100%);
+    }
+  }
+  @keyframes ds-fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes ds-fade-out {
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes ds-body-in {
+    from {
+      opacity: 0;
+      transform: translateX(24px);
+    }
+  }
+
+  /* Easing plot: x linear, y eased, so the dot traces the curve */
+  .ds-track-x.is-playing {
+    animation: ds-x 1.2s linear both;
+  }
+  .ds-track-y.is-playing {
+    animation: ds-y 1.2s var(--ease) both;
+  }
+  .ds-dot {
+    left: 0;
+    bottom: 0;
+    transform: translate(-50%, 50%) scale(1.6);
+  }
+  @keyframes ds-x {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(100%);
+    }
+  }
+  @keyframes ds-y {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(-100%);
+    }
+  }
+
+  /* Linear vs eased slide */
+  .ds-slide.is-playing {
+    animation: ds-slide 1s var(--ease) both;
+  }
+  @keyframes ds-slide {
+    to {
+      left: calc(100% - 0.375rem);
+    }
+  }
+
+  .ds-grain {
+    opacity: 0.35;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ds[open],
+    .ds[open]::backdrop,
+    .ds.is-closing,
+    .ds.is-closing::backdrop,
+    .ds[open] .ds-body,
+    .ds-anim.is-playing {
+      animation: none !important;
+    }
+    .ds-track-x.is-playing {
+      transform: translateX(100%);
+    }
+    .ds-track-y.is-playing {
+      transform: translateY(-100%);
+    }
+    .ds-slide.is-playing {
+      left: calc(100% - 0.375rem);
+    }
+  }
+</style>

@@ -88,6 +88,9 @@
          <div><dt>Page weight</dt><dd>${s.weight}</dd></div>
          <div><dt>DOM nodes</dt><dd>${s.nodes}</dd></div>
        </dl>
+       <button type="button" class="xray-hud-link" data-design-open aria-controls="design-system">
+         Design system <span aria-hidden="true">&rarr;</span>
+       </button>
        <p class="xray-hud-hint">Hover to inspect · <kbd>Esc</kbd> to exit</p>`,
     );
 
@@ -245,6 +248,9 @@
       disable();
   });
 
+  // Lets other features (e.g. the Design System panel) switch X-ray on
+  document.addEventListener("xray:enable", enable);
+
   // Stay on across page navigations (view transitions replace the body)
   document.addEventListener("astro:after-swap", () => {
     if (!enabled) return setButtons();
@@ -277,7 +283,7 @@
     font: 500 10px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
     letter-spacing: 0;
     text-transform: none;
-    color: #fff;
+    color: rgb(var(--paper));
     background: rgb(var(--accent-text));
     pointer-events: none;
   }
@@ -378,6 +384,27 @@
 
   .xray-hud dt {
     opacity: 0.6;
+  }
+
+  /* The HUD ignores the pointer, except for this one button */
+  .xray-hud-link {
+    pointer-events: auto;
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    margin-top: 10px;
+    padding: 6px 10px;
+    font: inherit;
+    font-weight: 600;
+    color: rgb(var(--paper));
+    border: 1px solid rgb(var(--paper) / 0.25);
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  .xray-hud-link:hover {
+    background: rgb(var(--accent-text));
+    border-color: rgb(var(--accent-text));
+    color: rgb(var(--paper));
   }
 
   .xray-hud-hint {

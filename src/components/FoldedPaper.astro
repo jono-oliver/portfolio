@@ -1,0 +1,48 @@
+---
+// Decorative folded-paper lighting behind the hero (see src/js/folded-paper.js).
+// Place inside a `relative isolate overflow-hidden` wrapper; that wrapper
+// drives the pointer interaction. The script loads after the page is idle.
+---
+
+<canvas
+  data-folded-paper
+  aria-hidden="true"
+  class="folded-paper pointer-events-none absolute inset-x-0 top-0 -z-10 h-[100svh] w-full opacity-0 transition-opacity duration-1000"
+></canvas>
+
+<script>
+  let destroy: (() => void) | null = null;
+
+  const mount = () => {
+    const canvas = document.querySelector<HTMLCanvasElement>("[data-folded-paper]");
+    if (!canvas) return;
+    const host = canvas.parentElement ?? document.body;
+
+    const run = async () => {
+      const { initFoldedPaper } = await import("../js/folded-paper.js");
+      if (!canvas.isConnected) return; // navigated away while loading
+      destroy = initFoldedPaper(canvas, host);
+      canvas.classList.remove("opacity-0");
+    };
+
+    "requestIdleCallback" in window
+      ? requestIdleCallback(run, { timeout: 1500 })
+      : setTimeout(run, 300);
+  };
+
+  const unmount = () => {
+    destroy?.();
+    destroy = null;
+  };
+
+  document.addEventListener("astro:page-load", mount);
+  document.addEventListener("astro:before-swap", unmount);
+</script>
+
+<style>
+  /* Fade towards the bottom so the paper melts into the page */
+  .folded-paper {
+    -webkit-mask-image: linear-gradient(to bottom, #000 60%, transparent);
+    mask-image: linear-gradient(to bottom, #000 60%, transparent);
+  }
+</style>
