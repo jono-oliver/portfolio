@@ -27,7 +27,7 @@ const padding: Record<string, string> = {
 };
 
 export const intro =
-  "An editorial, Swiss-inspired system: oversized uppercase type, generous space and hairline rules instead of cards or shadows. Everything is pared back so the work leads, with one small red square doing the job of a logo.";
+  "An editorial, Swiss-inspired system: oversized uppercase type, generous space and hairline rules instead of cards or shadows. Everything is pared back so the work leads, with one small accent square doing the job of a logo.";
 
 export type ColourToken = {
   token: string;
@@ -42,13 +42,13 @@ export const colours: ColourToken[] = [
   { token: "ink", name: "Ink", role: "Headings, body text, primary buttons", light: "slate-900", dark: "slate-50" },
   { token: "muted", name: "Muted", role: "Supporting copy, labels, metadata", light: "slate-500", dark: "slate-400" },
   { token: "line", name: "Line", role: "Hairline rules and borders", light: "slate-200", dark: "slate-800" },
-  { token: "accent", name: "Accent", role: "Hover fills, text selection", light: "slate-800", dark: "red-800" },
-  { token: "accent-text", name: "Accent text", role: "Full stop, markers, focus rings", light: "slate-800", dark: "red-500" },
+  { token: "accent", name: "Accent", role: "Hover fills, text selection", light: "slate-800", dark: "teal-800" },
+  { token: "accent-text", name: "Accent text", role: "Full stop, markers, focus rings", light: "slate-800", dark: "teal-400" },
 ];
 
 export const colourRationale = [
   "A near-monochrome slate palette with a single accent. Slate has a faint blue undertone, so it feels cooler and more considered than pure grey.",
-  "In dark mode the accent is red, used sparingly as a signature: the full stop after the name, the square markers and focus rings. In light mode it drops to slate so the page stays quiet.",
+  "In dark mode the accent is teal: a cool counterpoint that sits naturally with the blue-grey slate, used sparingly as a signature on the full stop after the name, the square markers and focus rings. The deeper teal-800 handles hover fills so white text on it stays readable. In light mode the accent drops to slate so the page stays quiet.",
   "Every colour is a CSS variable holding raw RGB values, which lets Tailwind apply opacity (bg-ink/80) and lets both themes swap with one class on <html>.",
 ];
 

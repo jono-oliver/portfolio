@@ -4,6 +4,7 @@ import { getProfile } from "../sanity/useSanityHelper";
 import SanityImage from "../components/SanityImage.astro";
 import SkillsGrid from "./SkillsGrid.astro";
 import SkillsMarquee from "./SkillsMarquee.astro";
+import FoldedPaper from "./FoldedPaper.astro";
 import { getHighlights, splitBio } from "../data/profile";
 
 const profile = await getProfile();
@@ -18,6 +19,9 @@ const lastName = rest.join(" ");
 const highlights = getHighlights(profile);
 const { lead: bioLead, rest: bioRest } = splitBio(bio);
 ---
+
+<div class="relative isolate overflow-hidden">
+<FoldedPaper />
 
 <section data-xray="HeroProfile"
   class="container flex min-h-[calc(100svh-4rem)] flex-col justify-between gap-12 pb-10 pt-10 lg:min-h-[calc(100svh-5rem)] lg:pt-16"
@@ -154,3 +158,4 @@ const { lead: bioLead, rest: bioRest } = splitBio(bio);
     <SkillsGrid items={skills} delay={400} />
   </div>
 </section>
+</div>

@@ -561,6 +561,12 @@ const curve = `M0 100 C${x1 * 100} ${100 - y1 * 100} ${x2 * 100} ${100 - y2 * 10
 </script>
 
 <style>
+  /* The scroll area takes focus on open (so arrow keys scroll it);
+     it isn't a control, so it shouldn't show a focus ring */
+  .ds-body:focus-visible {
+    outline: none;
+  }
+
   /* Drawer slide */
   .ds[open] {
     animation: ds-in 0.7s var(--ease-out-expo);
