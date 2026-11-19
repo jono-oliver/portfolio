@@ -5,7 +5,7 @@ import Pills from "./Pills.astro";
 const { title, imageCard, slug, excerpt, stack, index } = Astro.props;
 ---
 
-<li
+<li data-xray="PortfolioCard"
   class="border-b border-line"
   data-reveal="up"
   style={`--reveal-delay: ${Math.min(index, 5) * 80}ms`}
