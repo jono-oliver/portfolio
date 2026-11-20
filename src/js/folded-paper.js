@@ -19,7 +19,7 @@ const CREASES = [
 
 const STRENGTH_DARK = 0.07; // max opacity of light/shadow in dark mode
 const STRENGTH_LIGHT = 0.05; // shadows read stronger on light paper
-const HIGHLIGHT = 0.25; // brightness of lit facets relative to shadows (1 = equal)
+const HIGHLIGHT = 0.45; // brightness of lit facets relative to shadows (1 = equal)
 const FOLLOW = 0.06; // how quickly the light catches the cursor
 const IDLE_AFTER = 2500;
 
