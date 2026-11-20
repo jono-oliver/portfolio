@@ -127,19 +127,20 @@ const { lead: bioLead, rest: bioRest } = splitBio(bio);
       </div>
     </div>
 
+    <!-- The wrapper reveals too, so the accent frame fades in with the photo
+         rather than showing on its own. Below lg the portrait stacks under
+         the CTAs (480ms), so it waits for them; side by side on desktop it
+         can come in early. The photo's clip reveal inherits this delay. -->
     <div
-      class="relative mr-3 w-full max-w-md justify-self-center lg:col-span-5 lg:mr-3 lg:justify-self-end"
+      class="relative mr-3 w-full max-w-md justify-self-center [--reveal-delay:600ms] lg:col-span-5 lg:mr-3 lg:justify-self-end lg:[--reveal-delay:200ms]"
+      data-reveal="up"
     >
       <div
         class="absolute inset-0 translate-x-3 translate-y-3 border border-accent"
         aria-hidden="true"
       >
       </div>
-      <div
-        class="relative overflow-hidden"
-        data-reveal="image"
-        style="--reveal-delay: 200ms"
-      >
+      <div class="relative overflow-hidden" data-reveal="image">
         <!-- Hardcoded portrait (src/assets/portfolio-image.jpg), optimised by Astro.
              The landscape photo is cropped into a 4:5 frame, so it's drawn
              ~1.67x wider than the frame: `sizes` accounts for that. -->
