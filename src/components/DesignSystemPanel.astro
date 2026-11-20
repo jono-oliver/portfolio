@@ -623,12 +623,15 @@ const curve = `M0 100 C${x1 * 100} ${100 - y1 * 100} ${x2 * 100} ${100 - y2 * 10
     bottom: 0;
     transform: translate(-50%, 50%) scale(1.6);
   }
+  /* Animate the left edge rather than translateX: a translated full-size box
+     stays a panel-width past the edge (fill-mode both) and causes sideways
+     scroll when the figure is full width on mobile */
   @keyframes ds-x {
     from {
-      transform: translateX(0);
+      left: 0;
     }
     to {
-      transform: translateX(100%);
+      left: 100%;
     }
   }
   @keyframes ds-y {
@@ -665,7 +668,7 @@ const curve = `M0 100 C${x1 * 100} ${100 - y1 * 100} ${x2 * 100} ${100 - y2 * 10
       animation: none !important;
     }
     .ds-track-x.is-playing {
-      transform: translateX(100%);
+      left: 100%;
     }
     .ds-track-y.is-playing {
       transform: translateY(-100%);
