@@ -50,7 +50,7 @@ const { title, metaTitle, metaDescription, metaUrl, metaImage } = Astro.props;
 
     <!-- Runs before paint so the chosen theme never flashes -->
     <script is:inline>
-      const applyTheme = () => {
+      const applyTheme = (root) => {
         let stored = null;
         try {
           stored = localStorage.getItem("theme");
@@ -58,13 +58,18 @@ const { title, metaTitle, metaDescription, metaUrl, metaImage } = Astro.props;
         const prefersDark = window.matchMedia(
           "(prefers-color-scheme: dark)",
         ).matches;
-        const root = document.documentElement;
         root.classList.toggle("dark", stored ? stored === "dark" : prefersDark);
         root.classList.add("js");
       };
 
-      applyTheme();
-      document.addEventListener("astro:after-swap", applyTheme);
+      applyTheme(document.documentElement);
+      // Astro's swap replaces <html>'s attributes with the incoming page's.
+      // Put the classes on the incoming page first so "js" never drops off;
+      // if it does, the swap's scroll reset can flush styles in between and
+      // the reveals start animating out, then back in (seen on mobile).
+      document.addEventListener("astro:before-swap", (e) =>
+        applyTheme(e.newDocument.documentElement),
+      );
     </script>
 
     <ViewTransitions />
