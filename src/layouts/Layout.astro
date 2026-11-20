@@ -92,8 +92,22 @@ const { title, metaTitle, metaDescription, metaUrl, metaImage } = Astro.props;
     <script>
       import { initReveal } from "../js/reveal";
 
-      // Runs on first load and after every view transition
-      document.addEventListener("astro:page-load", initReveal);
+      // Runs on first load and after every view transition. astro:page-load
+      // fires while the page cross-fade is still running; reveals started
+      // then get restarted on iOS Safari when the transition's snapshot
+      // layers are torn down, so wait for the transition to finish.
+      let pendingTransition: ViewTransition | undefined;
+
+      document.addEventListener("astro:before-swap", (e) => {
+        pendingTransition = e.viewTransition;
+      });
+
+      document.addEventListener("astro:page-load", () => {
+        const transition = pendingTransition;
+        pendingTransition = undefined;
+        if (!transition) return initReveal();
+        transition.finished.catch(() => {}).finally(initReveal);
+      });
     </script>
   </body>
 </html>
