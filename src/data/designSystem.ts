@@ -27,7 +27,7 @@ const padding: Record<string, string> = {
 };
 
 export const intro =
-  "An editorial, Swiss-inspired system: oversized uppercase type, generous space and hairline rules instead of cards or shadows. Everything is pared back so the work leads, with one small accent square doing the job of a logo.";
+  "A simple, type-led design: big uppercase headings, plenty of space and thin lines instead of cards or shadows. It's kept minimal so the work comes first.";
 
 export type ColourToken = {
   token: string;
