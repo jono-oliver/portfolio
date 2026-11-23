@@ -1,17 +1,17 @@
 // Shared profile helpers used by the hero and the recruiter summary.
 
-export type Highlight = { full: string; short: string };
+export type Highlight = { full: string };
 
-// Focus areas shown beneath the job role. `short` is used where space is
-// tight. Uses `highlights` from the Sanity profile if present (same text at
-// every size), otherwise these defaults.
+// Focus areas shown beneath the job role, with the same wording at every
+// size. Uses `highlights` from the Sanity profile if present, otherwise
+// these defaults.
 export function getHighlights(profile: { highlights?: string[] }): Highlight[] {
   return profile.highlights?.length
-    ? profile.highlights.slice(0, 3).map((h) => ({ full: h, short: h }))
+    ? profile.highlights.slice(0, 3).map((h) => ({ full: h }))
     : [
-        { full: "Front end specialist", short: "Front end" },
-        { full: "AI Product Engineer", short: "AI product" },
-        { full: "Performance & accessibility", short: "Performance" },
+        { full: "Front end specialist" },
+        { full: "AI Product Engineer" },
+        { full: "Performance & accessibility" },
       ];
 }
 
