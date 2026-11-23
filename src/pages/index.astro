@@ -2,14 +2,24 @@
 import HeroProfile from "../components/HeroProfile.astro";
 import Layout from "../layouts/Layout.astro";
 import FeaturedPortfolio from "../components/FeaturedPortfolio.astro";
+import { getProfile } from "../sanity/useSanityHelper";
+import { personSchema, websiteSchema } from "../lib/structuredData";
+import { OG_IMAGE, SITE_URL } from "../data/site";
+
+const profile = await getProfile();
 ---
 
 <Layout
   title="Jonathan Oliver | Front End Engineer"
   metaTitle="Home"
   metaDescription="Jonathan Oliver | Front End Engineer"
-  metaImage="https://jonooliver.dev/og-image.jpg"
-  metaUrl=`https://jonooliver.dev`
+  metaImage={OG_IMAGE}
+  metaUrl={SITE_URL}
+  jsonLd={[personSchema(profile), websiteSchema()]}
+  alternates={[
+    { type: "text/plain", href: "/llms.txt", title: "llms.txt" },
+    { type: "application/json", href: "/api/profile.json", title: "Profile" },
+  ]}
 >
   <HeroProfile />
   <FeaturedPortfolio />

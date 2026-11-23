@@ -5,6 +5,11 @@ interface Props {
   metaDescription: string;
   metaUrl: string;
   metaImage: string;
+  ogType?: "website" | "article";
+  // Structured data for the page (see src/lib/structuredData.ts)
+  jsonLd?: object | object[];
+  // Machine-readable versions of the page, e.g. its markdown or the profile JSON
+  alternates?: { type: string; href: string; title?: string }[];
 }
 
 import { ViewTransitions } from "astro:transitions";
@@ -15,7 +20,18 @@ import Footer from "../components/Footer.astro";
 
 import "prism-themes/themes/prism-a11y-dark.css"; // Prism Theme
 
-const { title, metaTitle, metaDescription, metaUrl, metaImage } = Astro.props;
+const {
+  title,
+  metaTitle,
+  metaDescription,
+  metaUrl,
+  metaImage,
+  ogType = "website",
+  jsonLd,
+  alternates = [],
+} = Astro.props;
+
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).href;
 ---
 
 <!doctype html>
@@ -30,12 +46,12 @@ const { title, metaTitle, metaDescription, metaUrl, metaImage } = Astro.props;
 
     <!-- Open Graph meta tags -->
     <meta property="og:title" content={metaTitle} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:url" content={metaUrl} />
     <meta property="og:image" content={metaImage} />
     <meta property="og:description" content={metaDescription} />
     <meta property="og:site_name" content="Jonathan Oliver | Portfolio" />
-    <meta property="og:locale" content="en_UK" />
+    <meta property="og:locale" content="en_GB" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={metaTitle} />
@@ -43,6 +59,22 @@ const { title, metaTitle, metaDescription, metaUrl, metaImage } = Astro.props;
     <meta name="twitter:image" content={metaImage} />
     <meta name="twitter:url" content={metaUrl} />
     <meta name="twitter:site" content="@Jono_Oliver" />
+
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    {
+      alternates.map(({ type, href, title }) => (
+        <link rel="alternate" type={type} href={href} title={title} />
+      ))
+    }
+    {
+      jsonLd && (
+        <script
+          type="application/ld+json"
+          set:html={JSON.stringify(jsonLd).replace(/</g, "\\u003c")}
+        />
+      )
+    }
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />

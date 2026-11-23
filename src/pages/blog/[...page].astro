@@ -4,6 +4,8 @@ import Article from "../../components/Article.astro";
 import HeadingBlock from "../../components/HeadingBlock.astro";
 import Pagination from "../../components/Pagination.astro";
 import Layout from "../../layouts/Layout.astro";
+import { breadcrumbSchema } from "../../lib/structuredData";
+import { OG_IMAGE, absoluteUrl } from "../../data/site";
 import { getArticles } from "../../sanity/useSanityHelper";
 
 export const getStaticPaths = (async ({ paginate }) => {
@@ -12,6 +14,9 @@ export const getStaticPaths = (async ({ paginate }) => {
 }) satisfies GetStaticPaths;
 
 const { page } = Astro.props as { page: Page<any> };
+const crumbs = [{ name: "Blog", path: "/blog/" }];
+if (page.currentPage > 1)
+  crumbs.push({ name: `Page ${page.currentPage}`, path: page.url.current });
 const pageSuffix = page.currentPage > 1 ? ` – Page ${page.currentPage}` : "";
 ---
 
@@ -19,8 +24,9 @@ const pageSuffix = page.currentPage > 1 ? ` – Page ${page.currentPage}` : "";
   title={`Jonathan Oliver | Front End Engineer | Portfolio${pageSuffix}`}
   metaTitle={`Blog${pageSuffix}`}
   metaDescription="Learn, Engage, Have some fun!"
-  metaImage="https://jonooliver.dev/og-image.jpg"
-  metaUrl={`https://jonooliver.dev${page.url.current}`}
+  metaImage={OG_IMAGE}
+  metaUrl={absoluteUrl(page.url.current)}
+  jsonLd={breadcrumbSchema(crumbs)}
 >
   <HeadingBlock
     title="Blog"
