@@ -6,7 +6,11 @@ import PortfolioCard from "./PortfolioCard.astro";
 const projects = (await getProjects()).slice(0, 5);
 ---
 
-<section data-xray="FeaturedPortfolio" id="work" class="container scroll-mt-20 py-20 lg:py-32">
+<section
+  data-xray="FeaturedPortfolio"
+  id="work"
+  class="container scroll-mt-20 py-20 lg:py-32"
+>
   <div
     class="grid gap-6 border-b border-line pb-10 lg:grid-cols-12 lg:items-end"
   >

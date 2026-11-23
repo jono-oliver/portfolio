@@ -67,10 +67,16 @@ void main() {
 `;
 
 export function initFoldedPaper(canvas, host) {
-  const gl = canvas.getContext("webgl", { premultipliedAlpha: true, alpha: true, antialias: false });
+  const gl = canvas.getContext("webgl", {
+    premultipliedAlpha: true,
+    alpha: true,
+    antialias: false,
+  });
   if (!gl) return () => {}; // no WebGL: page is fine without it
 
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reduceMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
   const compile = (type, src) => {
@@ -89,24 +95,35 @@ export function initFoldedPaper(canvas, host) {
   // One triangle that covers the whole canvas
   const buf = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+  gl.bufferData(
+    gl.ARRAY_BUFFER,
+    new Float32Array([-1, -1, 3, -1, -1, 3]),
+    gl.STATIC_DRAW,
+  );
   const aPos = gl.getAttribLocation(prog, "aPos");
   gl.enableVertexAttribArray(aPos);
   gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
 
   const u = (name) => gl.getUniformLocation(prog, name);
-  const uRes = u("uRes"), uLight = u("uLight"), uCrease = u("uCrease"),
-    uAmp = u("uAmp"), uStrength = u("uStrength"), uFold = u("uFold"),
+  const uRes = u("uRes"),
+    uLight = u("uLight"),
+    uCrease = u("uCrease"),
+    uAmp = u("uAmp"),
+    uStrength = u("uStrength"),
+    uFold = u("uFold"),
     uHighlight = u("uHighlight");
 
-  let W = 1, H = 1;
+  let W = 1,
+    H = 1;
   const light = { x: 0, y: 0, tx: 0, ty: 0 };
 
   const setStrength = () => {
     gl.uniform1f(uHighlight, HIGHLIGHT);
     gl.uniform1f(
       uStrength,
-      document.documentElement.classList.contains("dark") ? STRENGTH_DARK : STRENGTH_LIGHT,
+      document.documentElement.classList.contains("dark")
+        ? STRENGTH_DARK
+        : STRENGTH_LIGHT,
     );
   };
 
@@ -124,12 +141,17 @@ export function initFoldedPaper(canvas, host) {
     const creases = [];
     CREASES.forEach((c) => {
       const a = (c.angle * Math.PI) / 180;
-      const nx = -Math.sin(a), ny = Math.cos(a);
-      const px = c.x * canvas.width, py = (1 - c.y) * canvas.height;
+      const nx = -Math.sin(a),
+        ny = Math.cos(a);
+      const px = c.x * canvas.width,
+        py = (1 - c.y) * canvas.height;
       creases.push(nx, ny, nx * px + ny * py);
     });
     gl.uniform3fv(uCrease, creases);
-    gl.uniform1fv(uAmp, CREASES.map((c) => c.amp));
+    gl.uniform1fv(
+      uAmp,
+      CREASES.map((c) => c.amp),
+    );
 
     if (!light.x && !light.y) {
       light.x = light.tx = W * 0.7;
@@ -218,7 +240,10 @@ export function initFoldedPaper(canvas, host) {
     setStrength();
     draw();
   });
-  mo.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+  mo.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["class"],
+  });
 
   return () => {
     stop();

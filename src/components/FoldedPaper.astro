@@ -14,7 +14,9 @@
   let destroy: (() => void) | null = null;
 
   const mount = () => {
-    const canvas = document.querySelector<HTMLCanvasElement>("[data-folded-paper]");
+    const canvas = document.querySelector<HTMLCanvasElement>(
+      "[data-folded-paper]",
+    );
     if (!canvas) return;
     const host = canvas.parentElement ?? document.body;
 

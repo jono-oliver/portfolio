@@ -38,12 +38,48 @@ export type ColourToken = {
 };
 
 export const colours: ColourToken[] = [
-  { token: "paper", name: "Paper", role: "Page background", light: "slate-50", dark: "slate-950" },
-  { token: "ink", name: "Ink", role: "Headings, body text, primary buttons", light: "slate-900", dark: "slate-50" },
-  { token: "muted", name: "Muted", role: "Supporting copy, labels, metadata", light: "slate-500", dark: "slate-400" },
-  { token: "line", name: "Line", role: "Hairline rules and borders", light: "slate-200", dark: "slate-800" },
-  { token: "accent", name: "Accent", role: "Hover fills, text selection", light: "slate-800", dark: "teal-800" },
-  { token: "accent-text", name: "Accent text", role: "Full stop, markers, focus rings", light: "slate-800", dark: "teal-400" },
+  {
+    token: "paper",
+    name: "Paper",
+    role: "Page background",
+    light: "slate-50",
+    dark: "slate-950",
+  },
+  {
+    token: "ink",
+    name: "Ink",
+    role: "Headings, body text, primary buttons",
+    light: "slate-900",
+    dark: "slate-50",
+  },
+  {
+    token: "muted",
+    name: "Muted",
+    role: "Supporting copy, labels, metadata",
+    light: "slate-500",
+    dark: "slate-400",
+  },
+  {
+    token: "line",
+    name: "Line",
+    role: "Hairline rules and borders",
+    light: "slate-200",
+    dark: "slate-800",
+  },
+  {
+    token: "accent",
+    name: "Accent",
+    role: "Hover fills, text selection",
+    light: "slate-800",
+    dark: "teal-800",
+  },
+  {
+    token: "accent-text",
+    name: "Accent text",
+    role: "Full stop, markers, focus rings",
+    light: "slate-800",
+    dark: "teal-400",
+  },
 ];
 
 export const colourRationale = [
@@ -79,12 +115,55 @@ export const fonts = [
 ];
 
 export const typeScale = [
-  { name: "Display", token: "text-display", value: displaySizes.display, sample: "Jonathan", px: 56, heading: true },
-  { name: "Display SM", token: "text-display-sm", value: displaySizes["display-sm"], sample: "Portfolio", px: 40, heading: true },
-  { name: "Display MD", token: "text-display-md", value: displaySizes["display-md"], sample: "Next project", px: 32, heading: true },
-  { name: "H2", token: "h2", value: "1.875rem → 2.25rem", sample: "Section title", px: 26, heading: true },
-  { name: "Body", token: "text-base / lg", value: "1rem → 1.125rem", sample: "Readable body copy at a comfortable measure.", px: 16, heading: false },
-  { name: "Eyebrow", token: ".eyebrow", value: "0.75rem · 0.2em tracking", sample: "Introduction", px: 12, heading: false, eyebrow: true },
+  {
+    name: "Display",
+    token: "text-display",
+    value: displaySizes.display,
+    sample: "Jonathan",
+    px: 56,
+    heading: true,
+  },
+  {
+    name: "Display SM",
+    token: "text-display-sm",
+    value: displaySizes["display-sm"],
+    sample: "Portfolio",
+    px: 40,
+    heading: true,
+  },
+  {
+    name: "Display MD",
+    token: "text-display-md",
+    value: displaySizes["display-md"],
+    sample: "Next project",
+    px: 32,
+    heading: true,
+  },
+  {
+    name: "H2",
+    token: "h2",
+    value: "1.875rem → 2.25rem",
+    sample: "Section title",
+    px: 26,
+    heading: true,
+  },
+  {
+    name: "Body",
+    token: "text-base / lg",
+    value: "1rem → 1.125rem",
+    sample: "Readable body copy at a comfortable measure.",
+    px: 16,
+    heading: false,
+  },
+  {
+    name: "Eyebrow",
+    token: ".eyebrow",
+    value: "0.75rem · 0.2em tracking",
+    sample: "Introduction",
+    px: 12,
+    heading: false,
+    eyebrow: true,
+  },
 ];
 
 export const typeRationale =
@@ -120,9 +199,24 @@ export const motion = {
 };
 
 export const motifs = [
-  { name: "Square marker", note: "The full stop after the name, reused as bullets, separators and section labels." },
-  { name: "Eyebrow label", note: "Small, wide-tracked uppercase that introduces each section." },
-  { name: "Link underline", note: "Draws in from the left on hover, leaves to the right." },
-  { name: "Arrow nudge", note: "Arrows shift forward to signal where a link goes." },
-  { name: "Film grain", note: "A faint noise overlay gives the flat palette a tactile, print-like feel." },
+  {
+    name: "Square marker",
+    note: "The full stop after the name, reused as bullets, separators and section labels.",
+  },
+  {
+    name: "Eyebrow label",
+    note: "Small, wide-tracked uppercase that introduces each section.",
+  },
+  {
+    name: "Link underline",
+    note: "Draws in from the left on hover, leaves to the right.",
+  },
+  {
+    name: "Arrow nudge",
+    note: "Arrows shift forward to signal where a link goes.",
+  },
+  {
+    name: "Film grain",
+    note: "A faint noise overlay gives the flat palette a tactile, print-like feel.",
+  },
 ];
