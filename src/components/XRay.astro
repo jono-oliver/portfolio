@@ -20,20 +20,35 @@
   const px = (v: string) => Math.round(parseFloat(v) || 0);
 
   const breakpoint = (w: number) =>
-    w >= 1536 ? "2xl" : w >= 1280 ? "xl" : w >= 1024 ? "lg" : w >= 768 ? "md" : w >= 640 ? "sm" : "base";
+    w >= 1536
+      ? "2xl"
+      : w >= 1280
+        ? "xl"
+        : w >= 1024
+          ? "lg"
+          : w >= 768
+            ? "md"
+            : w >= 640
+              ? "sm"
+              : "base";
 
   const toHex = (rgb: string) => {
     const m = rgb.match(/\d+(\.\d+)?/g);
     if (!m) return rgb;
     const [r, g, b] = m.map(Number);
-    return "#" + [r, g, b].map((n) => n.toString(16).padStart(2, "0")).join("").toUpperCase();
+    return (
+      "#" +
+      [r, g, b]
+        .map((n) => n.toString(16).padStart(2, "0"))
+        .join("")
+        .toUpperCase()
+    );
   };
 
   // Real numbers from the browser's own performance timings
   const pageStats = (): Stats => {
     const nav = performance.getEntriesByType("navigation")[0] as
-      | PerformanceNavigationTiming
-      | undefined;
+      PerformanceNavigationTiming | undefined;
     const resources = performance.getEntriesByType(
       "resource",
     ) as PerformanceResourceTiming[];
@@ -41,7 +56,10 @@
       (sum, e) => sum + (e ? e.transferSize || e.encodedBodySize || 0 : 0),
       0,
     );
-    const load = nav && nav.loadEventEnd > 0 ? nav.loadEventEnd : nav?.domContentLoadedEventEnd;
+    const load =
+      nav && nav.loadEventEnd > 0
+        ? nav.loadEventEnd
+        : nav?.domContentLoadedEventEnd;
     return {
       load: load ? `${(load / 1000).toFixed(2)}s` : "n/a",
       weight: bytes ? `${Math.round(bytes / 1024)} KB` : "n/a",
@@ -116,14 +134,20 @@
           .slice(0, 2)
           .map((c) => `<span class="xray-dim">.${c}</span>`)
           .join("");
-    const owner = target.parentElement?.closest<HTMLElement>("[data-xray]")?.dataset.xray;
+    const owner =
+      target.parentElement?.closest<HTMLElement>("[data-xray]")?.dataset.xray;
 
     const lines = [
       `<strong>${name}</strong>`,
       `${Math.round(r.width)} × ${Math.round(r.height)}`,
     ];
 
-    const pad = [cs.paddingTop, cs.paddingRight, cs.paddingBottom, cs.paddingLeft].map(px);
+    const pad = [
+      cs.paddingTop,
+      cs.paddingRight,
+      cs.paddingBottom,
+      cs.paddingLeft,
+    ].map(px);
     if (pad.some(Boolean)) lines.push(`padding ${pad.join(" ")}`);
 
     const hasText = [...target.childNodes].some(
@@ -136,7 +160,8 @@
         `<span class="xray-swatch" style="background:${cs.color}"></span>${toHex(cs.color)}`,
       );
     }
-    if (owner && !h.dataset.xray) lines.push(`<span class="xray-dim">in &lt;${owner} /&gt;</span>`);
+    if (owner && !h.dataset.xray)
+      lines.push(`<span class="xray-dim">in &lt;${owner} /&gt;</span>`);
     return lines.join("<br>");
   };
 
@@ -150,7 +175,12 @@
     }
     const cs = getComputedStyle(hovered);
     const r = hovered.getBoundingClientRect();
-    const m = [cs.marginTop, cs.marginRight, cs.marginBottom, cs.marginLeft].map(px);
+    const m = [
+      cs.marginTop,
+      cs.marginRight,
+      cs.marginBottom,
+      cs.marginLeft,
+    ].map(px);
 
     Object.assign(box.style, {
       display: "block",
@@ -244,7 +274,11 @@
     );
     if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
     if (e.shiftKey && e.key.toLowerCase() === "x") toggle();
-    else if (e.key === "Escape" && enabled && !document.querySelector("dialog[open]"))
+    else if (
+      e.key === "Escape" &&
+      enabled &&
+      !document.querySelector("dialog[open]")
+    )
       disable();
   });
 
@@ -280,7 +314,11 @@
     left: 0;
     z-index: 55;
     padding: 1px 6px;
-    font: 500 10px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+    font:
+      500 10px/1.5 ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      monospace;
     letter-spacing: 0;
     text-transform: none;
     color: rgb(var(--paper));
@@ -300,7 +338,11 @@
     bottom: 0.75rem;
     left: 50%;
     transform: translateX(-50%);
-    font: 500 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+    font:
+      500 10px/1 ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      monospace;
     color: rgb(var(--accent-text) / 0.7);
   }
 
@@ -329,7 +371,11 @@
     position: fixed;
     z-index: 62;
     pointer-events: none;
-    font: 400 11px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace;
+    font:
+      400 11px/1.6 ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      monospace;
     color: rgb(var(--paper));
     background: rgb(var(--ink) / 0.92);
     backdrop-filter: blur(8px);
@@ -398,7 +444,9 @@
     font-weight: 600;
     color: rgb(var(--paper));
     border: 1px solid rgb(var(--paper) / 0.25);
-    transition: background-color 0.3s, color 0.3s;
+    transition:
+      background-color 0.3s,
+      color 0.3s;
   }
 
   .xray-hud-link:hover {

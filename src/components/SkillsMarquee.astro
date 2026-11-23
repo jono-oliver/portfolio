@@ -14,12 +14,16 @@ const { items = [], class: className, ...rest } = Astro.props;
 const duration = `${Math.max(items.length * 2.75, 28)}s`;
 ---
 
-<div data-xray="SkillsMarquee"
+<div
+  data-xray="SkillsMarquee"
   class:list={["marquee overflow-hidden", className]}
   aria-hidden="true"
   {...rest}
 >
-  <div class="marquee-track flex w-max" style={`--marquee-duration: ${duration}`}>
+  <div
+    class="marquee-track flex w-max"
+    style={`--marquee-duration: ${duration}`}
+  >
     {
       [0, 1].map((copy) => (
         <div class:list={["flex shrink-0", copy && "is-copy"]}>

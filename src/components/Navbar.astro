@@ -11,7 +11,8 @@ const isActive = (href: string) =>
   href === "/" ? path === "/" : path.startsWith(href);
 ---
 
-<header data-xray="Navbar"
+<header
+  data-xray="Navbar"
   class="sticky top-0 z-40 border-b border-line/70 bg-paper/70 pt-[env(safe-area-inset-top)] backdrop-blur-md"
 >
   <nav
@@ -91,7 +92,12 @@ const isActive = (href: string) =>
           class="hidden h-9 w-9 place-items-center rounded-full border border-line text-ink transition-colors duration-300 hover:border-ink aria-pressed:border-accent-text aria-pressed:bg-accent-text aria-pressed:text-paper md:grid"
         >
           <!-- "Inspect element": dashed selection box with a cursor -->
-          <svg class="xray-icon h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <svg
+            class="xray-icon h-[18px] w-[18px]"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+          >
             <path
               class="xray-icon-box"
               d="M10 20H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v5"

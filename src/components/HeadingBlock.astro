@@ -2,7 +2,10 @@
 const { title, subTitle, label } = Astro.props;
 ---
 
-<section data-xray="HeadingBlock" class="container pb-6 pt-12 lg:pb-10 lg:pt-20">
+<section
+  data-xray="HeadingBlock"
+  class="container pb-6 pt-12 lg:pb-10 lg:pt-20"
+>
   <div data-reveal="up">
     <span class="eyebrow"
       ><span class="marker" aria-hidden="true"></span>{label ?? "Index"}</span
