@@ -44,11 +44,24 @@ npm run dev
 
 The site runs at `http://localhost:4321`. Content is pulled from Sanity's public dataset, so you don't need any keys.
 
-| Command           | What it does                         |
-| :---------------- | :----------------------------------- |
-| `npm run dev`     | Start the dev server                 |
-| `npm run build`   | Build the site to `./dist/`          |
-| `npm run preview` | Serve the built site to check it     |
+| Command           | What it does                     |
+| :---------------- | :------------------------------- |
+| `npm run dev`     | Start the dev server             |
+| `npm run build`   | Build the site to `./dist/`      |
+| `npm run preview` | Serve the built site to check it |
+
+## Working on it with Claude Code
+
+The repo includes [Claude Code](https://claude.com/claude-code) skills in `.claude/skills/`. Each check script also runs without Claude:
+
+| Skill                 | npm script             | What it does                                                                                                                                                      |
+| :-------------------- | :--------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mobile-check`        | `npm run check:mobile` | Tests phone, tablet and desktop widths (WebKit and Chromium) for sideways scroll, stuck reveals, reduced motion and view-transition jitter, and saves screenshots |
+| `agent-outputs-check` | `npm run check:agents` | Builds the site and validates llms.txt, the markdown pages, profile.json, JSON-LD and the sitemap                                                                 |
+| `design-tokens-sync`  | `npm run check:tokens` | Checks that the design system panel matches the real Tailwind and CSS tokens                                                                                      |
+| `/ship`               |                        | Branches, formats, builds, runs the relevant checks, commits and opens a PR                                                                                       |
+
+`check:mobile` needs the Playwright browsers once: `npx playwright install chromium webkit`. Reports and screenshots go to `.checks/`, which git ignores. `CLAUDE.md` has the project conventions, and a hook runs Prettier after each edit.
 
 ## Where things live
 
