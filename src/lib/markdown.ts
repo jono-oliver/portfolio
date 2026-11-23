@@ -13,6 +13,7 @@ export const projectMarkdownUrl = (slug: string) =>
   absoluteUrl(`/portfolio/${slug}.md`);
 export const articleMarkdownUrl = (slug: string) =>
   absoluteUrl(`/blog/${slug}.md`);
+export const homeMarkdownUrl = () => absoluteUrl("/index.md");
 
 // Portable Text body -> markdown. Sanity images become absolute image links;
 // code blocks ({ language, code }) are handled by the library's defaults.
@@ -86,6 +87,31 @@ export function profileToMarkdown(profile: any, cvUrl: string | null): string {
     `## Focus areas\n\n${highlights.join("\n")}`,
     profile.skills?.length && `## Skills\n\n${profile.skills.join(", ")}`,
     `## Contact\n\n${contact.join("\n")}`,
+  ]
+    .filter(Boolean)
+    .join("\n\n")
+    .concat("\n");
+}
+
+// Home page: the profile plus the recent projects the page features, with
+// links to each project's markdown version.
+export function homeToMarkdown(
+  profile: any,
+  cvUrl: string | null,
+  projects: any[],
+): string {
+  const recent = projects.map((p) => {
+    const excerpt = p.projectExcerpt?.trim();
+    return `- [${p.projectTitle}](${projectMarkdownUrl(p.slug.current)})${excerpt ? `: ${excerpt}` : ""}`;
+  });
+  return [
+    profileToMarkdown(profile, cvUrl).trimEnd(),
+    recent.length && `## Recent projects\n\n${recent.join("\n")}`,
+    `## More\n\n${[
+      `- [All projects](${absoluteUrl("/portfolio/")})`,
+      `- [Blog](${absoluteUrl("/blog/")})`,
+      `- [Site index for agents](${absoluteUrl("/llms.txt")})`,
+    ].join("\n")}`,
   ]
     .filter(Boolean)
     .join("\n\n")

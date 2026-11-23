@@ -22,7 +22,7 @@ Everything below is generated at build time from the same Sanity content as the 
 
 - **`/llms.txt`**: an index of the site in the [llms.txt](https://llmstxt.org) format
 - **`/llms-full.txt`**: the profile, every project and every article in one markdown file
-- **`/portfolio/<slug>.md`** and **`/blog/<slug>.md`**: a markdown version of each page, linked from its HTML with `<link rel="alternate">`
+- **`/index.md`**, **`/portfolio/<slug>.md`** and **`/blog/<slug>.md`**: a markdown version of the home page and each project and post, linked from its HTML with `<link rel="alternate">`
 - **`/api/profile.json`**: structured CV data (skills, contact, CV link, projects, articles)
 - **JSON-LD** on every page: `Person` and `WebSite` on the home page, `BlogPosting` and `CreativeWork` on detail pages, and breadcrumbs
 - **`/sitemap-index.xml`** and **`/robots.txt`**, which allow all crawlers

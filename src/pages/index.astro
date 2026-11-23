@@ -17,6 +17,7 @@ const profile = await getProfile();
   metaUrl={SITE_URL}
   jsonLd={[personSchema(profile), websiteSchema()]}
   alternates={[
+    { type: "text/markdown", href: "/index.md" },
     { type: "text/plain", href: "/llms.txt", title: "llms.txt" },
     { type: "application/json", href: "/api/profile.json", title: "Profile" },
   ]}
