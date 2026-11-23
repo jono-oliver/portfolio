@@ -1,0 +1,88 @@
+---
+import type { Page } from "astro";
+
+interface Props {
+  page: Page;
+  baseUrl: string;
+}
+
+const { page, baseUrl } = Astro.props;
+const { currentPage, lastPage } = page;
+
+const hrefFor = (n: number) => (n === 1 ? baseUrl : `${baseUrl}/${n}`);
+const pages = Array.from({ length: lastPage }, (_, i) => i + 1);
+---
+
+{
+  lastPage > 1 && (
+    <nav
+      data-xray="Pagination"
+      aria-label="Pagination"
+      class="flex items-center justify-between gap-6 border-t border-line pt-10 lg:pt-16"
+    >
+      {page.url.prev ? (
+        <a
+          href={page.url.prev}
+          class="link-underline group inline-flex items-center gap-2 text-sm font-medium"
+        >
+          <span
+            class="inline-block transition-transform duration-500 ease-out-expo group-hover:-translate-x-1.5"
+            aria-hidden="true"
+          >
+            &larr;
+          </span>
+          Previous
+        </a>
+      ) : (
+        <span
+          class="inline-flex items-center gap-2 text-sm font-medium text-muted opacity-50"
+          aria-hidden="true"
+        >
+          &larr; Previous
+        </span>
+      )}
+
+      <ol class="flex flex-wrap items-center justify-center gap-2">
+        {pages.map((n) => (
+          <li>
+            {n === currentPage ? (
+              <span
+                aria-current="page"
+                class="grid h-10 w-10 place-items-center rounded-full bg-accent text-sm font-medium text-white"
+              >
+                {n}
+              </span>
+            ) : (
+              <a
+                href={hrefFor(n)}
+                aria-label={`Page ${n}`}
+                class="grid h-10 w-10 place-items-center rounded-full border border-line text-sm font-medium transition-colors duration-500 hover:border-ink"
+              >
+                {n}
+              </a>
+            )}
+          </li>
+        ))}
+      </ol>
+
+      {page.url.next ? (
+        <a
+          href={page.url.next}
+          class="link-underline group inline-flex items-center gap-2 text-sm font-medium"
+        >
+          Next
+          <span class="arrow" aria-hidden="true">
+            &rarr;
+          </span>
+        </a>
+      ) : (
+        <span
+          class="inline-flex items-center gap-2 text-sm font-medium text-muted opacity-50"
+          aria-hidden="true"
+        >
+          Next &rarr;
+        </span>
+      )}
+    </nav>
+  )
+}

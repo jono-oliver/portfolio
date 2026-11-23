@@ -1,18 +1,26 @@
 ---
+import type { GetStaticPaths, Page } from "astro";
 import Article from "../../components/Article.astro";
 import HeadingBlock from "../../components/HeadingBlock.astro";
+import Pagination from "../../components/Pagination.astro";
 import Layout from "../../layouts/Layout.astro";
 import { getProjects } from "../../sanity/useSanityHelper";
 
-const projects = await getProjects();
+export const getStaticPaths = (async ({ paginate }) => {
+  const projects = await getProjects();
+  return paginate(projects, { pageSize: 6 });
+}) satisfies GetStaticPaths;
+
+const { page } = Astro.props as { page: Page<any> };
+const pageSuffix = page.currentPage > 1 ? ` – Page ${page.currentPage}` : "";
 ---
 
 <Layout
-  title="Jonathan Oliver | Front End Engineer | Portfolio"
-  metaTitle="Portfolio"
+  title={`Jonathan Oliver | Front End Engineer | Portfolio${pageSuffix}`}
+  metaTitle={`Portfolio${pageSuffix}`}
   metaDescription="A Showcase of Cutting-Edge Front-End Projects"
   metaImage="https://jonooliver.dev/og-image.jpg"
-  metaUrl=`https://jonooliver.dev/portfolio`
+  metaUrl={`https://jonooliver.dev${page.url.current}`}
 >
   <HeadingBlock
     title="Portfolio"
@@ -21,7 +29,7 @@ const projects = await getProjects();
   />
   <section class="container pb-16 lg:pb-24">
     {
-      projects.map((project, index) => (
+      page.data.map((project, index) => (
         <Article
           key={project._id}
           index={index}
@@ -34,5 +42,6 @@ const projects = await getProjects();
         />
       ))
     }
+    <Pagination page={page} baseUrl="/portfolio" />
   </section>
 </Layout>

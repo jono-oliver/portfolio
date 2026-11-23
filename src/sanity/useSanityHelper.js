@@ -4,7 +4,7 @@ import imageUrlBuilder from "@sanity/image-url";
 const builder = imageUrlBuilder(sanityClient);
 
 export async function getProjects() {
-  return await sanityClient.fetch(`*[_type == "portfolio"]`);
+  return await sanityClient.fetch(`*[_type == "portfolio"] | order(_createdAt desc)`);
 }
 
 export async function getProject(slug) {
@@ -17,7 +17,7 @@ export async function getProject(slug) {
 }
 
 export async function getArticles() {
-  return await sanityClient.fetch(`*[_type == "article"]`);
+  return await sanityClient.fetch(`*[_type == "article"] | order(_createdAt desc)`);
 }
 
 export async function getArticle(slug) {
