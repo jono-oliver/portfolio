@@ -16,6 +16,17 @@ The site also has two extras for anyone curious about how it's built:
 - **X-ray mode** (`Shift + X`): overlays the layout grid, labels each component and lets you inspect any element's spacing and size
 - **Design system panel** (`Shift + D` or `#design-system`): the colours, type, layout and motion the site uses, shown with the real tokens
 
+## For agents and crawlers
+
+Everything below is generated at build time from the same Sanity content as the site:
+
+- **`/llms.txt`**: an index of the site in the [llms.txt](https://llmstxt.org) format
+- **`/llms-full.txt`**: the profile, every project and every article in one markdown file
+- **`/portfolio/<slug>.md`** and **`/blog/<slug>.md`**: a markdown version of each page, linked from its HTML with `<link rel="alternate">`
+- **`/api/profile.json`**: structured CV data (skills, contact, CV link, projects, articles)
+- **JSON-LD** on every page: `Person` and `WebSite` on the home page, `BlogPosting` and `CreativeWork` on detail pages, and breadcrumbs
+- **`/sitemap-index.xml`** and **`/robots.txt`**, which allow all crawlers
+
 ## Built with
 
 - [Astro](https://astro.build): pages, layouts and view transitions
@@ -46,9 +57,10 @@ src/
 ├── pages/        Home, blog and portfolio routes
 ├── components/   Page sections, plus X-ray, design panel and recruiter view
 ├── layouts/      The shared page shell, meta tags and global styles
-├── data/         Hard-coded copy (profile highlights, design-system panel)
+├── data/         Hard-coded copy (profile highlights, site URL, design-system panel)
+├── lib/          Structured data (JSON-LD) and markdown builders for agents
 ├── js/           Scroll reveals and the hero's folded-paper effect
 ├── sanity/       Helpers for fetching content from Sanity
 └── assets/       Images that Astro optimises, like the hero portrait
-public/           Files served as-is: favicon, share image
+public/           Files served as-is: favicon, share image, robots.txt
 ```

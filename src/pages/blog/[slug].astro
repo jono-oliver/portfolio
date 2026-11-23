@@ -4,6 +4,8 @@ import PortableText from "../../components/PortableText.astro";
 import DetailHeader from "../../components/DetailHeader.astro";
 import NextLink from "../../components/NextLink.astro";
 import Prose from "../../components/Prose.astro";
+import { absoluteUrl } from "../../data/site";
+import { breadcrumbSchema, blogPostingSchema } from "../../lib/structuredData";
 import { getArticle, getArticles, urlFor } from "../../sanity/useSanityHelper";
 
 export async function getStaticPaths() {
@@ -24,14 +26,23 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params;
 const { next } = Astro.props;
+const article = await getArticle(slug);
 const {
   articleTitle,
   articleImage,
   articleExcerpt,
   articleTags,
   articleDescription,
-} = await getArticle(slug);
+} = article;
+const pageUrl = absoluteUrl(`/blog/${slug}/`);
 const metaImageUrl = urlFor(articleImage).url();
+const jsonLd = [
+  blogPostingSchema(article, pageUrl, metaImageUrl),
+  breadcrumbSchema([
+    { name: "Blog", path: "/blog/" },
+    { name: articleTitle, path: `/blog/${slug}/` },
+  ]),
+];
 ---
 
 <Layout
@@ -39,7 +50,10 @@ const metaImageUrl = urlFor(articleImage).url();
   metaTitle={articleTitle}
   metaDescription={articleExcerpt}
   metaImage={metaImageUrl}
-  metaUrl=`https://jonooliver.dev/blog/${slug}`
+  metaUrl={pageUrl}
+  ogType="article"
+  jsonLd={jsonLd}
+  alternates={[{ type: "text/markdown", href: `/blog/${slug}.md` }]}
 >
   <DetailHeader
     title={articleTitle}
