@@ -9,7 +9,11 @@ import {
 } from "../sanity/useSanityHelper";
 import { splitBio } from "../data/profile";
 import { absoluteUrl } from "../data/site";
-import { articleMarkdownUrl, projectMarkdownUrl } from "../lib/markdown";
+import {
+  articleMarkdownUrl,
+  homeMarkdownUrl,
+  projectMarkdownUrl,
+} from "../lib/markdown";
 
 const entry = (title: string, url: string, excerpt?: string) =>
   `- [${title}](${url})${excerpt?.trim() ? `: ${excerpt.trim()}` : ""}`;
@@ -24,6 +28,7 @@ export const GET: APIRoute = async () => {
   const { lead, rest } = splitBio(profile.bio);
 
   const optional = [
+    `- [Home page](${homeMarkdownUrl()}): profile, focus areas, skills, contact and recent projects`,
     `- [Full site content](${absoluteUrl("/llms-full.txt")}): profile, every project and every article in one file`,
     `- [Profile JSON](${absoluteUrl("/api/profile.json")}): structured CV data (skills, contact, projects, articles)`,
     cvUrl && `- [CV (PDF)](${cvUrl})`,
@@ -34,7 +39,7 @@ export const GET: APIRoute = async () => {
     `# ${profile.name}`,
     `> ${profile.jobRole}. ${lead}`,
     rest,
-    `Every page on ${absoluteUrl("/")} has a markdown version: add \`.md\` to a project or blog post URL.`,
+    `The home page, every project and every blog post have a markdown version: ${homeMarkdownUrl()}, or add \`.md\` to a project or blog post URL.`,
     `## Portfolio\n\n${projects
       .map((p: any) =>
         entry(

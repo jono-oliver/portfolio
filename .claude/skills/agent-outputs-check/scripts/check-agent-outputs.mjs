@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Validates the machine-readable side of the built site in dist/:
-// llms.txt, llms-full.txt, the .md page versions and their rel="alternate"
+// llms.txt, llms-full.txt, the .md page versions (home, projects, posts) and their rel="alternate"
 // links, /api/profile.json, JSON-LD on every page, the sitemap and robots.txt.
 //
 // Usage: node check-agent-outputs.mjs [--no-build] [--json]
@@ -134,6 +134,24 @@ for (const section of ["portfolio", "blog"]) {
   for (const md of mds)
     if (!slugs.includes(md))
       fail("markdown", `/${section}/${md}.md has no matching HTML page`);
+}
+
+// Home page: /index.md and its rel="alternate" link
+{
+  checked++;
+  if (!existsSync(join(dist, "index.md")))
+    fail("markdown", "/ has no /index.md");
+  else if (read("index.md").trim().length < 50)
+    fail("markdown", "/index.md is nearly empty");
+  else if (!read("index.md").startsWith("# "))
+    fail("markdown", "/index.md does not start with an H1");
+  const alt = read("index.html").match(
+    /<link[^>]*rel="alternate"[^>]*type="text\/markdown"[^>]*href="([^"]+)"/,
+  )?.[1];
+  if (!alt)
+    fail("markdown", `/ has no <link rel="alternate" type="text/markdown">`);
+  else if (alt !== "/index.md")
+    fail("markdown", `/ alternate points at ${alt}`);
 }
 
 // --- /api/profile.json ---------------------------------------------------------
