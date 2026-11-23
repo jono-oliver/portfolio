@@ -1,33 +1,76 @@
 ---
 import imageUrlBuilder from "@sanity/image-url";
-import type { ImageUrlBuilder } from "@sanity/image-url/lib/types/builder";
 import { sanityClient } from "sanity:client";
 
 const builder = imageUrlBuilder(sanityClient);
 
-const { node } = Astro.props;
-const { width = 960 } = Astro.props;
-const { classes } = Astro.props;
-let image: ImageUrlBuilder | undefined;
+const {
+  node,
+  width = 960,
+  classes,
+  loading = "lazy",
+  fetchpriority,
+  sizes = "100vw",
+} = Astro.props;
+
+const SRCSET_WIDTHS = [400, 800, 1200, 1600, 2000];
+const maxWidth = Number(width);
+
+// Intrinsic size from the asset ref (image-<hash>-<W>x<H>-<ext>), or from
+// dereferenced metadata. Used for width/height attributes (no layout shift)
+// and to avoid requesting widths larger than the source.
+function getDimensions(asset) {
+  const match = asset?._ref?.match(/-(\d+)x(\d+)-[a-z0-9]+$/i);
+  if (match) return { w: Number(match[1]), h: Number(match[2]) };
+  const dims = asset?.metadata?.dimensions;
+  if (dims?.width && dims?.height) return { w: dims.width, h: dims.height };
+  return null;
+}
+
+const urlAt = (w: number) =>
+  builder.image(node).width(w).fit("max").auto("format").url();
+
+let src: string | undefined;
+let srcset: string | undefined;
+let attrWidth: number | undefined;
+let attrHeight: number | undefined;
 
 // See https://www.sanity.io/docs/presenting-images for general documentation on
 // presenting images, and https://www.sanity.io/docs/image-url for specifics on
 // this builder API
 try {
-  image =
-    node &&
-    node.asset &&
-    builder.image(node).width(width).fit("max").auto("format");
+  if (node?.asset) {
+    const dims = getDimensions(node.asset);
+    const cap = dims ? Math.min(maxWidth, dims.w) : maxWidth;
+
+    src = urlAt(cap);
+
+    const widths = SRCSET_WIDTHS.filter((w) => w < cap);
+    widths.push(cap);
+    srcset = widths.map((w) => `${urlAt(w)} ${w}w`).join(", ");
+
+    if (dims) {
+      attrWidth = cap;
+      attrHeight = Math.round((dims.h / dims.w) * cap);
+    }
+  }
 } catch (error) {
   console.error(error);
 }
 ---
 
 {
-  image && (
+  src && (
     <img
       class={classes}
-      src={image.url()}
+      src={src}
+      srcset={srcset}
+      sizes={sizes}
+      width={attrWidth}
+      height={attrHeight}
+      loading={loading}
+      decoding="async"
+      fetchpriority={fetchpriority}
       alt={node.alt || ""}
       title={node.alt}
     />

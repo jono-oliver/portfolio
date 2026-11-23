@@ -24,6 +24,7 @@ const { title, imageCard, slug, excerpt, stack, index } = Astro.props;
         classes="aspect-[4/3] w-full object-cover"
         node={imageCard}
         width="800"
+        sizes="100vw"
       />
     </div>
 
@@ -38,6 +39,7 @@ const { title, imageCard, slug, excerpt, stack, index } = Astro.props;
           classes="h-full w-full object-cover transition-transform duration-1000 ease-out-expo group-hover:scale-110 group-focus-visible:scale-110"
           node={imageCard}
           width="400"
+          sizes="(min-width: 1024px) 15vw, 1px"
         />
       </div>
       <div

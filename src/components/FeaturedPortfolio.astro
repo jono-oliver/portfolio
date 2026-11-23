@@ -3,7 +3,7 @@ import { getProjects } from "../sanity/useSanityHelper";
 
 import PortfolioCard from "./PortfolioCard.astro";
 
-const projects = await getProjects();
+const projects = (await getProjects()).slice(0, 5);
 ---
 
 <section data-xray="FeaturedPortfolio" id="work" class="container scroll-mt-20 py-20 lg:py-32">

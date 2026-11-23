@@ -27,6 +27,9 @@ const flip = index % 2 === 1;
           classes="aspect-[16/10] w-full object-cover transition-transform duration-1000 ease-out-expo group-hover:scale-105"
           node={projectImage}
           width="1440"
+          sizes="(min-width: 1024px) 55vw, 100vw"
+          loading={index === 0 ? "eager" : "lazy"}
+          fetchpriority={index === 0 ? "high" : undefined}
         />
       </div>
     </div>

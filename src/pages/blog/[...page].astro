@@ -1,18 +1,26 @@
 ---
+import type { GetStaticPaths, Page } from "astro";
 import Article from "../../components/Article.astro";
 import HeadingBlock from "../../components/HeadingBlock.astro";
+import Pagination from "../../components/Pagination.astro";
 import Layout from "../../layouts/Layout.astro";
 import { getArticles } from "../../sanity/useSanityHelper";
 
-const articles = await getArticles();
+export const getStaticPaths = (async ({ paginate }) => {
+  const articles = await getArticles();
+  return paginate(articles, { pageSize: 6 });
+}) satisfies GetStaticPaths;
+
+const { page } = Astro.props as { page: Page<any> };
+const pageSuffix = page.currentPage > 1 ? ` – Page ${page.currentPage}` : "";
 ---
 
 <Layout
-  title="Jonathan Oliver | Front End Engineer | Portfolio"
-  metaTitle="Blog"
+  title={`Jonathan Oliver | Front End Engineer | Portfolio${pageSuffix}`}
+  metaTitle={`Blog${pageSuffix}`}
   metaDescription="Learn, Engage, Have some fun!"
   metaImage="https://jonooliver.dev/og-image.jpg"
-  metaUrl=`https://jonooliver.dev/blog`
+  metaUrl={`https://jonooliver.dev${page.url.current}`}
 >
   <HeadingBlock
     title="Blog"
@@ -21,7 +29,7 @@ const articles = await getArticles();
   />
   <section class="container pb-16 lg:pb-24">
     {
-      articles.map((article, index) => (
+      page.data.map((article, index) => (
         <Article
           key={article._id}
           index={index}
@@ -34,5 +42,6 @@ const articles = await getArticles();
         />
       ))
     }
+    <Pagination page={page} baseUrl="/blog" />
   </section>
 </Layout>
