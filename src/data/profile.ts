@@ -21,6 +21,15 @@ export function splitBio(bio = ""): { lead: string; rest: string } {
   return match ? { lead: match[1], rest: match[2] } : { lead: bio, rest: "" };
 }
 
+// Home page meta description: the profile's SEO description if set,
+// otherwise the bio's lead sentence
+export function getSeoDescription(profile: {
+  seoDescription?: string;
+  bio?: string;
+}): string {
+  return profile.seoDescription?.trim() || splitBio(profile.bio).lead;
+}
+
 // Shown at the top of the recruiter summary. Set to "" to hide it.
 export const AVAILABILITY = "Open to new opportunities";
 

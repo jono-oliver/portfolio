@@ -4,9 +4,14 @@ import PortableText from "../../components/PortableText.astro";
 import DetailHeader from "../../components/DetailHeader.astro";
 import NextLink from "../../components/NextLink.astro";
 import Prose from "../../components/Prose.astro";
-import { absoluteUrl } from "../../data/site";
+import { absoluteUrl, pageTitle } from "../../data/site";
 import { breadcrumbSchema, blogPostingSchema } from "../../lib/structuredData";
-import { getArticle, getArticles, urlFor } from "../../sanity/useSanityHelper";
+import {
+  getArticle,
+  getArticles,
+  urlFor,
+  getProfile,
+} from "../../sanity/useSanityHelper";
 
 export async function getStaticPaths() {
   const articles = await getArticles();
@@ -26,6 +31,7 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params;
 const { next } = Astro.props;
+const profile = await getProfile();
 const article = await getArticle(slug);
 const {
   articleTitle,
@@ -46,7 +52,7 @@ const jsonLd = [
 ---
 
 <Layout
-  title=`Jonathan Oliver | Front End Engineer | Portfolio | ${articleTitle}`
+  title={pageTitle(profile, "Blog", articleTitle)}
   metaTitle={articleTitle}
   metaDescription={articleExcerpt}
   metaImage={metaImageUrl}

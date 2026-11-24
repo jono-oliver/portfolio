@@ -4,15 +4,16 @@ import Layout from "../layouts/Layout.astro";
 import FeaturedPortfolio from "../components/FeaturedPortfolio.astro";
 import { getProfile } from "../sanity/useSanityHelper";
 import { personSchema, websiteSchema } from "../lib/structuredData";
-import { OG_IMAGE, SITE_URL } from "../data/site";
+import { OG_IMAGE, SITE_URL, pageTitle } from "../data/site";
+import { getSeoDescription } from "../data/profile";
 
 const profile = await getProfile();
 ---
 
 <Layout
-  title="Jonathan Oliver | Front End Engineer"
-  metaTitle="Home"
-  metaDescription="Jonathan Oliver | Front End Engineer"
+  title={pageTitle(profile)}
+  metaTitle={pageTitle(profile)}
+  metaDescription={getSeoDescription(profile)}
   metaImage={OG_IMAGE}
   metaUrl={SITE_URL}
   jsonLd={[personSchema(profile), websiteSchema()]}
