@@ -43,7 +43,10 @@ const walk = (dir) =>
     return statSync(p).isDirectory() ? walk(p) : [p];
   });
 const files = walk(dist);
-const htmlPages = files.filter((f) => f.endsWith(".html"));
+// The Sanity Studio at /admin is not a public page, so skip it
+const htmlPages = files.filter(
+  (f) => f.endsWith(".html") && !relative(dist, f).startsWith("admin"),
+);
 const read = (rel) => readFileSync(join(dist, rel), "utf8");
 
 // Map a site URL or root-relative path to a file in dist/. Returns null for

@@ -15,10 +15,16 @@ export default defineConfig({
       dataset: "production",
       // Set useCdn to false if you're building statically.
       useCdn: false,
+      // Embedded Studio. Hash routing keeps the route prerendered, so no adapter is needed.
+      studioBasePath: "/admin",
+      studioRouterHistory: "hash",
     }),
     react(),
     vue(),
-    sitemap(),
+    sitemap({
+      // Leave out the Studio route only, not pages whose slug starts with "admin"
+      filter: (page) => !/^\/admin(\/|$)/.test(new URL(page).pathname),
+    }),
   ],
   vite: {
     ssr: {
