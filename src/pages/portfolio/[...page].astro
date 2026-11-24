@@ -5,8 +5,8 @@ import HeadingBlock from "../../components/HeadingBlock.astro";
 import Pagination from "../../components/Pagination.astro";
 import Layout from "../../layouts/Layout.astro";
 import { breadcrumbSchema } from "../../lib/structuredData";
-import { OG_IMAGE, absoluteUrl } from "../../data/site";
-import { getProjects } from "../../sanity/useSanityHelper";
+import { OG_IMAGE, absoluteUrl, pageTitle } from "../../data/site";
+import { getProjects, getProfile } from "../../sanity/useSanityHelper";
 
 export const getStaticPaths = (async ({ paginate }) => {
   const projects = await getProjects();
@@ -17,11 +17,12 @@ const { page } = Astro.props as { page: Page<any> };
 const crumbs = [{ name: "Work", path: "/portfolio/" }];
 if (page.currentPage > 1)
   crumbs.push({ name: `Page ${page.currentPage}`, path: page.url.current });
+const profile = await getProfile();
 const pageSuffix = page.currentPage > 1 ? ` – Page ${page.currentPage}` : "";
 ---
 
 <Layout
-  title={`Jonathan Oliver | Front End Engineer | Portfolio${pageSuffix}`}
+  title={pageTitle(profile, `Portfolio${pageSuffix}`)}
   metaTitle={`Portfolio${pageSuffix}`}
   metaDescription="A Showcase of Cutting-Edge Front-End Projects"
   metaImage={OG_IMAGE}
@@ -43,7 +44,7 @@ const pageSuffix = page.currentPage > 1 ? ` – Page ${page.currentPage}` : "";
           slug={project.slug.current}
           title={project.projectTitle}
           excerpt={project.projectExcerpt}
-          projectImage={project.projectImage}
+          projectImage={project.projectCardImage ?? project.projectImage}
           stack={project.projectTechStack}
         />
       ))

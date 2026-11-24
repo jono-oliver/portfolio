@@ -75,8 +75,7 @@ src/
 ├── data/         Hard-coded copy (profile highlights, site URL, design-system panel)
 ├── lib/          Structured data (JSON-LD) and markdown builders for agents
 ├── js/           Scroll reveals and the hero's folded-paper effect
-├── sanity/       Helpers for fetching content from Sanity, and the Studio schemas (schemaTypes/)
-└── assets/       Images that Astro optimises, like the hero portrait
+└── sanity/       Helpers for fetching content from Sanity, and the Studio schemas (schemaTypes/)
 public/           Files served as-is: favicon, share image, robots.txt
 sanity.config.js  The Studio served at /admin
 sanity.cli.js     Lets `npx sanity …` commands (dataset export, GraphQL deploy) target the project

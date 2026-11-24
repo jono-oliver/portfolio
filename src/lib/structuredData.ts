@@ -3,6 +3,7 @@
 // one Person (PERSON_ID) so agents can tie the pages to their author.
 
 import { SOCIAL, getHighlights, splitBio } from "../data/profile";
+import { urlFor } from "../sanity/useSanityHelper";
 import {
   OG_IMAGE,
   PERSON_ID,
@@ -25,7 +26,10 @@ export function personSchema(profile: any) {
     description: splitBio(profile.bio).lead || undefined,
     url: SITE_URL,
     email: profile.contactEmail ? `mailto:${profile.contactEmail}` : undefined,
-    image: OG_IMAGE,
+    // The Sanity portrait, falling back to the share image
+    image: profile.profilePicture?.asset
+      ? urlFor(profile.profilePicture).width(800).auto("format").url()
+      : OG_IMAGE,
     sameAs: [SOCIAL.linkedin, SOCIAL.github],
     knowsAbout: [...highlights, ...(profile.skills ?? [])],
   };

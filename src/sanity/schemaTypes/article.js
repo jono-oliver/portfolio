@@ -1,3 +1,5 @@
+// Fields are in the order they appear on the article page (DetailHeader then
+// the body), with the card image, which only shows on the blog list, last
 export default {
   name: "article",
   title: "Article",
@@ -18,9 +20,28 @@ export default {
       },
     },
     {
+      name: "articleTags",
+      title: "Article Tags",
+      description: "Shown under “Tags” on the article page.",
+      type: "array",
+      of: [{ type: "string" }],
+    },
+    {
       name: "articleExcerpt",
       title: "Article Excerpt",
+      description:
+        "Shown under “Overview” on the article page, on the blog list and as the page's search description.",
       type: "string",
+    },
+    {
+      name: "articleImage",
+      title: "Article Image",
+      description:
+        "The large image under the overview on the article page, and the image used when the page is shared. Also used on the blog list card when no card image is set.",
+      type: "image",
+      options: {
+        hotspot: true,
+      },
     },
     {
       name: "articleDescription",
@@ -62,26 +83,14 @@ export default {
       ],
     },
     {
-      name: "articleImage",
-      title: "Article Image",
-      type: "image",
-      options: {
-        hotspot: true,
-      },
-    },
-    {
       name: "articleCardImage",
       title: "Article Card Image",
+      description:
+        "Optional. A version cropped or framed for the blog list card. Leave empty to use the article image. Sizing is automatic, so there's no need to upload a smaller copy.",
       type: "image",
       options: {
         hotspot: true,
       },
-    },
-    {
-      name: "articleTags",
-      title: "Article Tags",
-      type: "array",
-      of: [{ type: "string" }],
     },
   ],
 };
