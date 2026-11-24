@@ -37,7 +37,7 @@ const {
   projectTitle,
   projectImage,
   projectExcerpt,
-  projectTechStack,
+  techStack,
   projectDescription,
 } = project;
 const pageUrl = absoluteUrl(`/portfolio/${slug}/`);
@@ -64,7 +64,7 @@ const jsonLd = [
   <DetailHeader
     title={projectTitle}
     excerpt={projectExcerpt}
-    tags={projectTechStack}
+    tags={techStack}
     tagsLabel="Stack"
     image={projectImage}
     backHref="/portfolio"

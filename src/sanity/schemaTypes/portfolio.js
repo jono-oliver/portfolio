@@ -22,9 +22,10 @@ export default {
     {
       name: "projectTechStack",
       title: "Project Tech Stack",
-      description: "Shown under “Stack” on the project page and on its card.",
+      description:
+        "Shown under “Stack” on the project page and on its card. Pick technologies: each one's icon is set once on the Technology and shown wherever it's used.",
       type: "array",
-      of: [{ type: "string" }],
+      of: [{ type: "reference", to: [{ type: "technology" }] }],
     },
     {
       name: "projectExcerpt",
