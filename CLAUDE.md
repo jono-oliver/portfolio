@@ -6,6 +6,7 @@ Jonathan Oliver's portfolio, live at https://jonooliver.dev. The README covers w
 
 - Astro 4 (static output, `<ViewTransitions />`), Tailwind 3, and a few React and Vue islands
 - Content comes from Sanity's public dataset (`8d98wy85` / `production`) through `src/sanity/useSanityHelper.js`. No keys are needed. Content changes happen in Sanity, not in this repo.
+- The Sanity Studio is embedded at `/admin` by `@sanity/astro` (`studioBasePath` in `astro.config.mjs`, hash routing so it stays prerendered). Its config is `sanity.config.js` and the schemas live in `src/sanity/schemaTypes/`. Schema changes do belong in this repo. `/admin` is kept out of the sitemap, robots.txt and `check:agents`.
 - Node 22, npm
 
 ## Commands

@@ -44,6 +44,8 @@ npm run dev
 
 The site runs at `http://localhost:4321`. Content is pulled from Sanity's public dataset, so you don't need any keys.
 
+The Sanity Studio for editing that content is built into the site at **`/admin`** (`http://localhost:4321/admin` locally). It's a static page using hash routing, so Studio URLs look like `/admin#/structure/...`. You need a Sanity login with access to the project, and the origin you're on must be listed under API → CORS origins (with credentials allowed) in sanity.io/manage.
+
 | Command           | What it does                     |
 | :---------------- | :------------------------------- |
 | `npm run dev`     | Start the dev server             |
@@ -73,7 +75,9 @@ src/
 ├── data/         Hard-coded copy (profile highlights, site URL, design-system panel)
 ├── lib/          Structured data (JSON-LD) and markdown builders for agents
 ├── js/           Scroll reveals and the hero's folded-paper effect
-├── sanity/       Helpers for fetching content from Sanity
+├── sanity/       Helpers for fetching content from Sanity, and the Studio schemas (schemaTypes/)
 └── assets/       Images that Astro optimises, like the hero portrait
 public/           Files served as-is: favicon, share image, robots.txt
+sanity.config.js  The Studio served at /admin
+sanity.cli.js     Lets `npx sanity …` commands (dataset export, GraphQL deploy) target the project
 ```
