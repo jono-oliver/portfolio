@@ -2,7 +2,7 @@
 // renders into <script type="application/ld+json">. Everything points back to
 // one Person (PERSON_ID) so agents can tie the pages to their author.
 
-import { SOCIAL, getHighlights, splitBio } from "../data/profile";
+import { SOCIAL, getHighlights, skillNames, splitBio } from "../data/profile";
 import { urlFor } from "../sanity/useSanityHelper";
 import {
   OG_IMAGE,
@@ -31,7 +31,7 @@ export function personSchema(profile: any) {
       ? urlFor(profile.profilePicture).width(800).auto("format").url()
       : OG_IMAGE,
     sameAs: [SOCIAL.linkedin, SOCIAL.github],
-    knowsAbout: [...highlights, ...(profile.skills ?? [])],
+    knowsAbout: [...highlights, ...skillNames(profile)],
   };
 }
 

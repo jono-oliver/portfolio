@@ -1,8 +1,10 @@
 ---
 // Skills shown as a static, scannable index grid. Data comes straight from
-// the Sanity profile `skills` array passed in as `items`.
+// the Sanity profile `skills` (with icons, from getSkillsWithIcons) passed in
+// as `items`.
+import SkillIcon from "./SkillIcon.astro";
 interface Props {
-  items: string[];
+  items: { name: string; iconDataUri: string | null }[];
   label?: string;
   /** Base reveal delay in ms; each skill then staggers in after it */
   delay?: number;
@@ -48,8 +50,9 @@ const itemDelay = (i: number) => delay + Math.min(i * 25, 600);
               class="marker scale-0 transition-transform duration-300 group-hover:scale-100"
               aria-hidden="true"
             />
-            <span class="-translate-x-4 truncate transition-transform duration-300 group-hover:translate-x-0">
-              {item}
+            <span class="flex min-w-0 -translate-x-4 items-center gap-2 transition-transform duration-300 group-hover:translate-x-0">
+              {item.iconDataUri && <SkillIcon src={item.iconDataUri} />}
+              <span class="truncate">{item.name}</span>
             </span>
           </div>
         </li>

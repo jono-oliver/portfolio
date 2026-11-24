@@ -8,11 +8,18 @@ import {
   getProjects,
   getResumeUrl,
 } from "../sanity/useSanityHelper";
-import { AVAILABILITY, SOCIAL, getHighlights, splitBio } from "../data/profile";
+import {
+  AVAILABILITY,
+  SOCIAL,
+  getHighlights,
+  skillNames,
+  splitBio,
+} from "../data/profile";
 
 const profile = await getProfile();
 const projects = await getProjects();
-const { name, bio, contactEmail, skills = [], jobRole } = profile;
+const { name, bio, contactEmail, jobRole } = profile;
+const skills = skillNames(profile);
 const cvUrl = await getResumeUrl(profile);
 
 const highlights = getHighlights(profile);

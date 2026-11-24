@@ -1,5 +1,6 @@
 import { sanityClient } from "sanity:client";
 import imageUrlBuilder from "@sanity/image-url";
+import { skillName } from "../data/profile";
 
 const builder = imageUrlBuilder(sanityClient);
 
@@ -47,4 +48,45 @@ export async function getResumeUrl(profile) {
 
 export function urlFor(source) {
   return builder.image(source);
+}
+
+// Uploaded SVGs, fetched once per build
+const svgCache = new Map();
+async function fetchSvg(url) {
+  if (!svgCache.has(url)) {
+    svgCache.set(
+      url,
+      fetch(url)
+        .then((res) => (res.ok ? res.text() : null))
+        .catch(() => null),
+    );
+  }
+  return svgCache.get(url);
+}
+
+const toDataUri = (svg) =>
+  svg?.includes("<svg")
+    ? `data:image/svg+xml,${encodeURIComponent(svg.trim())}`
+    : null;
+
+// Skills with their icon as a data: URI (or null), for SkillIcon.astro.
+// An uploaded SVG wins over a picked icon (icon.metadata.inlineSvg). A failed
+// fetch leaves that skill without an icon rather than failing the build.
+export async function getSkillsWithIcons(profile) {
+  const skills = profile?.skills ?? [];
+  const resolved = await Promise.all(
+    skills.map(async (skill) => {
+      const name = skillName(skill);
+      if (!name) return null;
+      if (typeof skill === "string") return { name, iconDataUri: null };
+
+      let svg = null;
+      if (skill.customIcon?.asset) {
+        svg = await fetchSvg(urlFor(skill.customIcon).url());
+      }
+      svg ??= skill.icon?.metadata?.inlineSvg ?? null;
+      return { name, iconDataUri: toDataUri(svg) };
+    }),
+  );
+  return resolved.filter(Boolean);
 }

@@ -1,0 +1,29 @@
+---
+// A skill's icon, drawn in the current text colour. The SVG is used as a CSS
+// mask (a data: URI built at build time), so picked and uploaded icons look
+// alike, follow dark mode and hover colours, and never run SVG scripts.
+// Decorative: the skill name is always shown as text next to it.
+interface Props {
+  src: string;
+  class?: string;
+}
+
+const { src, class: className } = Astro.props;
+---
+
+<span
+  class:list={["skill-icon", className]}
+  style={`--icon: url("${src}")`}
+  aria-hidden="true"></span>
+
+<style>
+  .skill-icon {
+    display: inline-block;
+    flex-shrink: 0;
+    width: 1em;
+    height: 1em;
+    background-color: currentColor;
+    -webkit-mask: var(--icon) center / contain no-repeat;
+    mask: var(--icon) center / contain no-repeat;
+  }
+</style>
