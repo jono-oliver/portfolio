@@ -11,6 +11,7 @@ import {
   AVAILABILITY,
   SOCIAL,
   getHighlights,
+  skillNames,
   splitBio,
 } from "../../data/profile";
 import { SITE_URL } from "../../data/site";
@@ -35,7 +36,7 @@ export const GET: APIRoute = async () => {
     summary: splitBio(profile.bio).lead,
     bio: profile.bio,
     highlights: getHighlights(profile).map((h) => h.full),
-    skills: profile.skills ?? [],
+    skills: skillNames(profile),
     contact: {
       email: profile.contactEmail ?? null,
       linkedin: SOCIAL.linkedin,

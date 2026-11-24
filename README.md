@@ -46,6 +46,8 @@ The site runs at `http://localhost:4321`. Content is pulled from Sanity's public
 
 The Sanity Studio for editing that content is built into the site at **`/admin`** (`http://localhost:4321/admin` locally). It's a static page using hash routing, so Studio URLs look like `/admin#/structure/...`. You need a Sanity login with access to the project, and the origin you're on must be listed under API → CORS origins (with credentials allowed) in sanity.io/manage.
 
+Each skill on the profile can have an icon: upload an SVG on the skill in the Studio. Icons are drawn in the text colour, so simple single-colour shapes work best. Skills changed from plain text to skill objects, so existing content needs a one-off migration: `npx sanity login`, then `npx sanity migration run skills-to-objects` (a dry run) and the same command with `--no-dry-run`.
+
 | Command           | What it does                     |
 | :---------------- | :------------------------------- |
 | `npm run dev`     | Start the dev server             |
@@ -79,4 +81,5 @@ src/
 public/           Files served as-is: favicon, share image, robots.txt
 sanity.config.js  The Studio served at /admin
 sanity.cli.js     Lets `npx sanity …` commands (dataset export, GraphQL deploy) target the project
+migrations/       One-off Sanity content migrations, run with `npx sanity migration run <name>`
 ```

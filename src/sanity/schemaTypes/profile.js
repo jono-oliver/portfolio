@@ -61,9 +61,10 @@ export default {
     {
       name: "skills",
       title: "Skills",
-      description: "The scrolling marquee and skills grid below the hero.",
+      description:
+        "The scrolling marquee and skills grid below the hero. Each skill can have an optional icon.",
       type: "array",
-      of: [{ type: "string" }],
+      of: [{ type: "skill" }],
     },
     {
       name: "seoDescription",

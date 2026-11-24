@@ -3,7 +3,12 @@
 
 import { portableTextToMarkdown } from "@portabletext/markdown";
 import { urlFor } from "../sanity/useSanityHelper";
-import { AVAILABILITY, SOCIAL, getHighlights } from "../data/profile";
+import {
+  AVAILABILITY,
+  SOCIAL,
+  getHighlights,
+  skillNames,
+} from "../data/profile";
 import { absoluteUrl } from "../data/site";
 
 // Canonical HTML URLs end in "/" (matching the sitemap); markdown ones in ".md"
@@ -85,7 +90,8 @@ export function profileToMarkdown(profile: any, cvUrl: string | null): string {
     AVAILABILITY && `Availability: ${AVAILABILITY}`,
     profile.bio,
     `## Focus areas\n\n${highlights.join("\n")}`,
-    profile.skills?.length && `## Skills\n\n${profile.skills.join(", ")}`,
+    skillNames(profile).length &&
+      `## Skills\n\n${skillNames(profile).join(", ")}`,
     `## Contact\n\n${contact.join("\n")}`,
   ]
     .filter(Boolean)

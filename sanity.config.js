@@ -2,6 +2,7 @@ import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
 import { visionTool } from "@sanity/vision";
 import { codeInput } from "@sanity/code-input";
+import { IconManager } from "sanity-plugin-icon-manager";
 import { schemaTypes } from "./src/sanity/schemaTypes";
 
 // The site reads the first profile it finds (getProfile in src/sanity/useSanityHelper.js),
@@ -33,6 +34,14 @@ export default defineConfig({
     }),
     visionTool(),
     codeInput(),
+    // Icon picker for skills. A plain search (keepItSimpleFor) because the
+    // site ignores colour, size and rotation: icons take the text colour.
+    // The SVG is stored on the skill, so the site never calls Iconify.
+    IconManager({
+      keepItSimpleFor: "all",
+      availableCollections: ["simple-icons", "devicon-plain", "lucide", "mdi"],
+      defaults: { inlineSvg: true },
+    }),
   ],
 
   schema: {

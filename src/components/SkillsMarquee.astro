@@ -1,10 +1,12 @@
 ---
 // Decorative single-row skills ticker. Data comes straight from the Sanity
-// profile `skills` array passed in as `items`. The full, readable list sits
+// profile `skills` (with icons, from getSkillsWithIcons) passed in as `items`. The full, readable list sits
 // below it (SkillsGrid), so this is hidden from screen readers.
 // Reduced motion shows a static, edge-faded row.
+import SkillIcon from "./SkillIcon.astro";
+
 interface Props {
-  items: string[];
+  items: { name: string; iconDataUri: string | null }[];
   [key: string]: any;
 }
 
@@ -29,7 +31,12 @@ const duration = `${Math.max(items.length * 2.75, 28)}s`;
         <div class:list={["flex shrink-0", copy && "is-copy"]}>
           {items.map((item) => (
             <span class="flex items-center gap-4 whitespace-nowrap pr-4 font-heading text-lg font-medium tracking-tight text-muted transition-colors duration-300 hover:text-ink sm:text-xl lg:gap-6 lg:pr-6 lg:text-2xl">
-              {item}
+              <span class="inline-flex items-center gap-2 lg:gap-3">
+                {item.iconDataUri && (
+                  <SkillIcon src={item.iconDataUri} class="text-[0.8em]" />
+                )}
+                {item.name}
+              </span>
               <span class="marker" />
             </span>
           ))}

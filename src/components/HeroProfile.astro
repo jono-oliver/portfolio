@@ -1,14 +1,18 @@
 ---
 import { sanityClient } from "sanity:client";
-import { getProfile, urlFor } from "../sanity/useSanityHelper";
+import {
+  getProfile,
+  getSkillsWithIcons,
+  urlFor,
+} from "../sanity/useSanityHelper";
 import SkillsGrid from "./SkillsGrid.astro";
 import SkillsMarquee from "./SkillsMarquee.astro";
 import FoldedPaper from "./FoldedPaper.astro";
 import { getHighlights, splitBio } from "../data/profile";
 
 const profile = await getProfile();
-const { name, bio, contactEmail, skills, resume, jobRole, profilePicture } =
-  profile;
+const { name, bio, contactEmail, resume, jobRole, profilePicture } = profile;
+const skills = await getSkillsWithIcons(profile);
 
 // Portrait from the Sanity profile, cropped to the 4:5 frame by Sanity so the
 // download matches what's shown. The crop follows the hotspot set in the

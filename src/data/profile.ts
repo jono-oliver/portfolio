@@ -15,6 +15,17 @@ export function getHighlights(profile: { highlights?: string[] }): Highlight[] {
       ];
 }
 
+// A skill is a plain string (before the skills-to-objects migration) or a
+// skill object from the Studio. These read either shape.
+export type SkillInput = string | { name?: string; [key: string]: any };
+
+export const skillName = (skill: SkillInput): string =>
+  (typeof skill === "string" ? skill : (skill?.name ?? "")).trim();
+
+export function skillNames(profile: { skills?: SkillInput[] }): string[] {
+  return (profile.skills ?? []).map(skillName).filter(Boolean);
+}
+
 // Splits the bio into an emphasised lead sentence and the supporting rest
 export function splitBio(bio = ""): { lead: string; rest: string } {
   const match = bio.trim().match(/^(.+?[.!?])\s+([\s\S]+)$/);
