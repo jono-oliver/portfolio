@@ -43,7 +43,7 @@ const projects = (await getProjects()).slice(0, 5);
           title={project.projectTitle}
           excerpt={project.projectExcerpt}
           imageCard={project.projectCardImage ?? project.projectImage}
-          stack={project.projectTechStack}
+          stack={project.techStack}
         />
       ))
     }

@@ -1,5 +1,6 @@
 ---
-// Shared pill list used for skills, tech stacks and tags.
+// Shared pill list used for skills, tech stacks and tags. Items are strings,
+// or { name, iconDataUri } for tech stacks with icons.
 // `hoverable`: each pill darkens on its own hover.
 // `inverts`: pills turn white when the parent .group row is hovered or
 // focused (used on the accent fill rows on the home page).
@@ -10,6 +11,7 @@ const {
   class: className,
   ...rest
 } = Astro.props;
+import SkillIcon from "./SkillIcon.astro";
 ---
 
 <ul class:list={["flex flex-wrap gap-2", className]} {...rest}>
@@ -23,7 +25,16 @@ const {
             "lg:group-hover:border-white/30 lg:group-hover:text-white/80 lg:group-focus-visible:border-white/30 lg:group-focus-visible:text-white/80",
         ]}
       >
-        {item}
+        {typeof item === "string" ? (
+          item
+        ) : item.iconDataUri ? (
+          <span class="inline-flex items-center gap-1.5">
+            <SkillIcon src={item.iconDataUri} />
+            {item.name}
+          </span>
+        ) : (
+          item.name
+        )}
       </li>
     ))
   }
