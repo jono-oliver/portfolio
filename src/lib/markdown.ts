@@ -10,6 +10,7 @@ import {
   skillNames,
 } from "../data/profile";
 import { absoluteUrl } from "../data/site";
+import { articleTldr, projectTldr } from "./tldr";
 
 // Canonical HTML URLs end in "/" (matching the sitemap); markdown ones in ".md"
 export const projectUrl = (slug: string) => absoluteUrl(`/portfolio/${slug}/`);
@@ -40,6 +41,27 @@ const metaLine = (parts: (string | false | undefined)[]) =>
 
 const formatDate = (iso?: string) => iso?.slice(0, 10);
 
+// "## TL;DR" sections, placed before the full body and split from it by a
+// rule (empty string if none)
+function projectTldrToMarkdown(project: any): string {
+  const { problem, built, outcome } = projectTldr(project);
+  const parts = [
+    problem && `**Problem:** ${problem}`,
+    built.length && built.map((item) => `- ${item}`).join("\n"),
+    outcome && `**Outcome:** ${outcome}`,
+  ].filter(Boolean);
+  return parts.length ? `## TL;DR\n\n${parts.join("\n\n")}\n\n---` : "";
+}
+
+function articleTldrToMarkdown(article: any): string {
+  const { takeaways, snippet } = articleTldr(article);
+  const parts = [
+    takeaways.length && takeaways.map((item) => `- ${item}`).join("\n"),
+    snippet && `\`\`\`${snippet.language ?? ""}\n${snippet.code}\n\`\`\``,
+  ].filter(Boolean);
+  return parts.length ? `## TL;DR\n\n${parts.join("\n\n")}\n\n---` : "";
+}
+
 export function projectToMarkdown(project: any): string {
   const url = projectUrl(project.slug.current);
   return [
@@ -51,6 +73,7 @@ export function projectToMarkdown(project: any): string {
         `Stack: ${project.projectTechStack.join(", ")}`,
       project._createdAt && `Published: ${formatDate(project._createdAt)}`,
     ]),
+    projectTldrToMarkdown(project),
     toMarkdown(project.projectDescription),
   ]
     .filter(Boolean)
@@ -70,6 +93,7 @@ export function articleToMarkdown(article: any): string {
       article.articleTags?.length && `Tags: ${article.articleTags.join(", ")}`,
       article._createdAt && `Published: ${formatDate(article._createdAt)}`,
     ]),
+    articleTldrToMarkdown(article),
     toMarkdown(article.articleDescription),
   ]
     .filter(Boolean)

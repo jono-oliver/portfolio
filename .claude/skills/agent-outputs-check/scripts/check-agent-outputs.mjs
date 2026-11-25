@@ -133,6 +133,16 @@ for (const section of ["portfolio", "blog"]) {
       );
     else if (alt !== `/${section}/${slug}.md`)
       fail("markdown", `/${section}/${slug}/ alternate points at ${alt}`);
+    // A page with a TL;DR pane should carry it into its markdown too
+    if (
+      /<div[^>]*data-pane="tldr"/.test(html) &&
+      mds.includes(slug) &&
+      !read(`${section}/${slug}.md`).includes("## TL;DR")
+    )
+      fail(
+        "markdown",
+        `/${section}/${slug}/ has a TL;DR but /${section}/${slug}.md does not`,
+      );
   }
   for (const md of mds)
     if (!slugs.includes(md))

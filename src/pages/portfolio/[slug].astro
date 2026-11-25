@@ -4,6 +4,8 @@ import PortableText from "../../components/PortableText.astro";
 import DetailHeader from "../../components/DetailHeader.astro";
 import NextLink from "../../components/NextLink.astro";
 import Prose from "../../components/Prose.astro";
+import ReadingModes from "../../components/ReadingModes.astro";
+import Tldr from "../../components/Tldr.astro";
 import { absoluteUrl, pageTitle } from "../../data/site";
 import { breadcrumbSchema, projectSchema } from "../../lib/structuredData";
 import {
@@ -12,6 +14,12 @@ import {
   urlFor,
   getProfile,
 } from "../../sanity/useSanityHelper";
+import {
+  hasProjectTldr,
+  projectTldr,
+  projectTldrMinutes,
+  readingMinutes,
+} from "../../lib/tldr";
 
 export async function getStaticPaths() {
   const projects = await getProjects();
@@ -40,6 +48,14 @@ const {
   techStack,
   projectDescription,
 } = project;
+const tldr = hasProjectTldr(project) ? projectTldr(project) : null;
+const tldrSections = tldr
+  ? [
+      { heading: "Problem", text: tldr.problem },
+      { heading: "What I built", list: tldr.built },
+      { heading: "Outcome", text: tldr.outcome },
+    ].filter((section) => section.text || section.list?.length)
+  : [];
 const pageUrl = absoluteUrl(`/portfolio/${slug}/`);
 const metaImageUrl = urlFor(projectImage).url();
 const jsonLd = [
@@ -72,9 +88,27 @@ const jsonLd = [
     transitionName={`portfolio-${slug}`}
   />
 
-  <Prose>
-    <PortableText value={projectDescription} />
-  </Prose>
+  {
+    tldr ? (
+      <ReadingModes
+        fullMinutes={readingMinutes(projectDescription)}
+        tldrMinutes={projectTldrMinutes(project)}
+      >
+        <Tldr
+          slot="tldr"
+          sections={tldrSections}
+          fullLabel="Read the full case study"
+        />
+        <Prose reveal={false} compact>
+          <PortableText value={projectDescription} />
+        </Prose>
+      </ReadingModes>
+    ) : (
+      <Prose>
+        <PortableText value={projectDescription} />
+      </Prose>
+    )
+  }
 
   {
     next && (
