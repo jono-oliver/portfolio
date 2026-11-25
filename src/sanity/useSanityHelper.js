@@ -101,16 +101,33 @@ const toDataUri = (svg) =>
     ? `data:image/svg+xml,${encodeURIComponent(svg.trim())}`
     : null;
 
+// The picked icon's SVG URL on Iconify, used when the icon manager didn't
+// store the SVG (it sometimes saves an icon without metadata.inlineSvg).
+// Built from the icon id ("mdi:react" -> /mdi/react.svg): the saved
+// metadata.url uses the "mdi:react.svg" form, which returns 404.
+function iconifyUrl(icon) {
+  const match = (icon?.icon ?? "").match(/^([a-z0-9-]+):([a-z0-9-]+)$/);
+  return match
+    ? `https://api.iconify.design/${match[1]}/${match[2]}.svg`
+    : null;
+}
+
 // An item's icon (skill or technology) as a data: URI, or null, for
-// SkillIcon.astro. An uploaded SVG wins over a picked icon
-// (icon.metadata.inlineSvg). A failed fetch means no icon, not a failed build.
+// SkillIcon.astro. An uploaded SVG wins over a picked icon. A picked icon
+// uses its stored SVG (icon.metadata.inlineSvg), or is fetched from Iconify
+// at build time if that's missing. A failed fetch means no icon, not a
+// failed build.
 export async function iconDataUriFor(item) {
   if (!item || typeof item === "string") return null;
   let svg = null;
   if (item.customIcon?.asset) {
     svg = await fetchSvg(urlFor(item.customIcon).url());
   }
-  svg ??= item.icon?.metadata?.inlineSvg ?? null;
+  svg ??= item.icon?.metadata?.inlineSvg || null;
+  if (!svg && item.icon) {
+    const url = iconifyUrl(item.icon);
+    if (url) svg = await fetchSvg(url);
+  }
   return toDataUri(svg);
 }
 
