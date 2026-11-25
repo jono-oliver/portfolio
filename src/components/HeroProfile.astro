@@ -44,6 +44,15 @@ const lastName = rest.join(" ");
 
 const highlights = getHighlights(profile);
 const { lead: bioLead, rest: bioRest } = splitBio(bio);
+
+// Bio paragraphs as text runs, with hyphenated words ("Stockton-on-Tees",
+// "front-end") marked so they never break across lines
+const toRuns = (text: string) =>
+  text
+    .split(/(\S*\w-\w\S*)/)
+    .filter(Boolean)
+    .map((part) => ({ text: part, keep: /\w-\w/.test(part) }));
+const bioParagraphs = [bioLead, bioRest].filter(Boolean).map(toRuns);
 ---
 
 <div class="relative isolate overflow-hidden">
@@ -96,7 +105,7 @@ const { lead: bioLead, rest: bioRest } = splitBio(bio);
         </p>
 
         <ul
-          class="mt-3 flex flex-col items-start gap-y-1 text-sm text-muted sm:text-base md:flex-row md:flex-wrap md:items-center md:gap-x-4 lg:mt-4 lg:text-lg"
+          class="mt-3 flex flex-col items-start gap-y-1 text-sm text-muted sm:mt-1 sm:text-base md:flex-row md:flex-wrap md:items-center md:gap-x-4 lg:text-lg"
           aria-label="Focus areas"
         >
           {
@@ -122,20 +131,38 @@ const { lead: bioLead, rest: bioRest } = splitBio(bio);
           }
         </ul>
 
-        <div
+        <!-- The bio as a quote: one colour, an oversized accent opening mark
+             above an accent rule -->
+        <figure
           class="mt-10 max-w-xl lg:mt-12"
           data-reveal="up"
           style="--reveal-delay: 420ms"
         >
-          <p class="text-lg font-medium leading-snug lg:text-xl">{bioLead}</p>
-          {
-            bioRest && (
-              <p class="mt-3 text-base leading-relaxed text-muted lg:text-lg">
-                {bioRest}
-              </p>
-            )
-          }
-        </div>
+          <span
+            class="-ml-[0.06em] block h-[0.5em] select-none font-heading text-7xl font-bold leading-none text-accent-text lg:text-8xl"
+            aria-hidden="true">&ldquo;</span
+          >
+          <blockquote class="border-l-2 border-accent-text pl-6 lg:pl-8">
+            {
+              bioParagraphs.map((runs, i) => (
+                <p
+                  class:list={[
+                    "font-heading text-lg font-medium leading-relaxed lg:text-xl",
+                    i > 0 && "mt-4",
+                  ]}
+                >
+                  {runs.map((run) =>
+                    run.keep ? (
+                      <span class="whitespace-nowrap">{run.text}</span>
+                    ) : (
+                      run.text
+                    ),
+                  )}
+                </p>
+              ))
+            }
+          </blockquote>
+        </figure>
 
         <div
           class="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4 lg:mt-12"
