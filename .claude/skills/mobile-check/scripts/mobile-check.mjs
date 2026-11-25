@@ -123,7 +123,9 @@ function findOverflow() {
       s.visibility !== "hidden" &&
       el.clientHeight >= innerHeight * 0.5 &&
       el.scrollWidth > el.clientWidth + 1 &&
-      !el.closest("pre")
+      !el.closest("pre") &&
+      // Intentional sideways sliders (e.g. Testimonials)
+      !el.closest("[data-carousel]")
     ) {
       el.scrollLeft = 10_000;
       if (el.scrollLeft > 0) panels.push(el);

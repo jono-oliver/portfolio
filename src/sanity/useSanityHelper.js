@@ -66,6 +66,14 @@ export async function getArticle(slug) {
   );
 }
 
+// Testimonials for the home page slider, newest first. Only complete ones.
+export async function getTestimonials() {
+  return await sanityClient.fetch(
+    `*[_type == "testimonial" && defined(quote) && defined(name)]
+      | order(_createdAt desc){ _id, quote, name, role, company }`,
+  );
+}
+
 export async function getProfile() {
   return await sanityClient.fetch(`*[_type == "profile"][0]`);
 }

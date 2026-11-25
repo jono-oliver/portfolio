@@ -6,7 +6,7 @@ I'm a Front End Software Engineer based in Stockton-on-Tees. This is where I sha
 
 ## What's on the site
 
-- **Home**: an intro, my skills and a few featured projects
+- **Home**: an intro, my skills, a few featured projects and testimonials
 - **Work**: case studies for individual projects
 - **Blog**: articles, with syntax-highlighted code
 - **Recruiter view**: the whole site condensed into one screen. Open it from the navbar or share a link ending in `#at-a-glance`.

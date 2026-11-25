@@ -2,6 +2,7 @@
 import HeroProfile from "../components/HeroProfile.astro";
 import Layout from "../layouts/Layout.astro";
 import FeaturedPortfolio from "../components/FeaturedPortfolio.astro";
+import Testimonials from "../components/Testimonials.astro";
 import { getProfile } from "../sanity/useSanityHelper";
 import { personSchema, websiteSchema } from "../lib/structuredData";
 import { OG_IMAGE, SITE_URL, pageTitle } from "../data/site";
@@ -25,4 +26,5 @@ const profile = await getProfile();
 >
   <HeroProfile />
   <FeaturedPortfolio />
+  <Testimonials />
 </Layout>

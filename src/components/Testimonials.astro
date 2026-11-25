@@ -1,0 +1,409 @@
+---
+// Testimonials slider for the home page. Content comes from Sanity
+// `testimonial` documents (getTestimonials). A CSS snap-scroll track that
+// moves on by itself; the script below handles autoplay, the counter and the
+// progress line. Renders nothing when there are no testimonials.
+import { getTestimonials } from "../sanity/useSanityHelper";
+
+const testimonials = await getTestimonials();
+const total = testimonials.length;
+const pad = (n: number) => String(n).padStart(2, "0");
+const byline = (t: { role?: string; company?: string }) =>
+  [t.role, t.company]
+    .map((part) => part?.trim())
+    .filter(Boolean)
+    .join(", ");
+---
+
+{
+  total > 0 && (
+    <section
+      data-xray="Testimonials"
+      id="testimonials"
+      class="container scroll-mt-20 pb-20 lg:pb-32"
+      aria-roledescription="carousel"
+      aria-label="Testimonials"
+      data-testimonials
+    >
+      <div class="grid gap-6 border-b border-line pb-10 lg:grid-cols-12 lg:items-end">
+        <div class="lg:col-span-6">
+          <span class="eyebrow" data-reveal="up">
+            <span class="marker" aria-hidden="true" />
+            Testimonials
+          </span>
+          <h2 class="mt-4 text-display-sm font-bold">
+            <span data-reveal="mask">
+              <span>Kind words</span>
+            </span>
+          </h2>
+        </div>
+        <p
+          class="max-w-md leading-relaxed text-muted lg:col-span-5 lg:col-start-8"
+          data-reveal="up"
+          style="--reveal-delay: 120ms"
+        >
+          A few words from the people I've worked with, on what it's like to
+          build things together.
+        </p>
+      </div>
+
+      {/* Reveal the whole slider, never single slides: slides off to the
+          side never intersect the viewport and would stay hidden */}
+      <div data-reveal="up" style="--reveal-delay: 180ms">
+        <ul
+          class="relative flex snap-x snap-mandatory gap-8 overflow-x-auto overscroll-x-contain py-12 [scrollbar-width:none] lg:py-16 [&::-webkit-scrollbar]:hidden"
+          aria-live="polite"
+          data-carousel
+          data-track
+        >
+          {testimonials.map((t: any, i: number) => (
+            <li
+              class="w-full shrink-0 snap-start"
+              role="group"
+              aria-roledescription="slide"
+              aria-label={`${i + 1} of ${total}`}
+              data-slide
+            >
+              <figure class="max-w-5xl">
+                <blockquote class="font-heading text-2xl font-medium leading-tight tracking-tight text-ink sm:text-3xl lg:text-4xl xl:text-5xl">
+                  <p class="quote">{t.quote.trim()}</p>
+                </blockquote>
+                <figcaption class="mt-8 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm lg:mt-10">
+                  <span class="marker" aria-hidden="true" />
+                  <span class="font-medium text-ink">{t.name.trim()}</span>
+                  {byline(t) && <span class="text-muted">{byline(t)}</span>}
+                </figcaption>
+              </figure>
+            </li>
+          ))}
+        </ul>
+
+        {total > 1 && (
+          <div class="flex items-center gap-4 border-t border-line pt-6 sm:gap-6">
+            <span
+              class="shrink-0 font-heading text-sm font-medium tabular-nums text-muted"
+              aria-hidden="true"
+            >
+              <span class="text-ink" data-current>
+                01
+              </span>{" "}
+              / {pad(total)}
+            </span>
+
+            <span
+              class="relative h-px flex-1 overflow-hidden bg-line"
+              aria-hidden="true"
+              data-progress-bar
+            >
+              <span
+                class="absolute inset-0 origin-left scale-x-0 bg-ink"
+                data-progress
+              />
+            </span>
+
+            <div class="flex shrink-0 items-center gap-2">
+              <button
+                type="button"
+                class="testimonial-btn"
+                aria-label="Pause testimonials"
+                data-toggle
+              >
+                <svg
+                  class="h-3.5 w-3.5"
+                  viewBox="0 0 16 16"
+                  fill="currentColor"
+                  aria-hidden="true"
+                  data-icon-pause
+                >
+                  <rect x="3" y="2" width="3.5" height="12" />
+                  <rect x="9.5" y="2" width="3.5" height="12" />
+                </svg>
+                <svg
+                  class="hidden h-3.5 w-3.5"
+                  viewBox="0 0 16 16"
+                  fill="currentColor"
+                  aria-hidden="true"
+                  data-icon-play
+                >
+                  <path d="M4 2l10 6-10 6z" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                class="testimonial-btn group"
+                aria-label="Previous testimonial"
+                data-prev
+              >
+                <span
+                  class="inline-block transition-transform duration-500 ease-out-expo group-hover:-translate-x-0.5"
+                  aria-hidden="true"
+                >
+                  &larr;
+                </span>
+              </button>
+              <button
+                type="button"
+                class="testimonial-btn group"
+                aria-label="Next testimonial"
+                data-next
+              >
+                <span
+                  class="inline-block transition-transform duration-500 ease-out-expo group-hover:translate-x-0.5"
+                  aria-hidden="true"
+                >
+                  &rarr;
+                </span>
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+  )
+}
+
+<style>
+  /* Curly quotes in the accent colour, drawn here so no stray spaces creep
+     in around them. (No hanging mark: the track's overflow would clip it.) */
+  .quote::before {
+    content: "\201C";
+    @apply text-accent-text;
+  }
+
+  .quote::after {
+    content: "\201D";
+    @apply text-accent-text;
+  }
+
+  .testimonial-btn {
+    @apply grid h-11 w-11 place-items-center rounded-full border border-line text-ink transition-colors duration-500 hover:border-accent hover:bg-accent hover:text-white lg:h-12 lg:w-12;
+  }
+</style>
+
+<script>
+  // Autoplay for the testimonials slider. Time is counted in a rAF loop so
+  // pausing and resuming carries on from where the progress line stopped.
+  const INTERVAL = 7000;
+
+  let teardown: (() => void)[] = [];
+
+  function initCarousel(root: HTMLElement) {
+    const track = root.querySelector<HTMLElement>("[data-track]");
+    const slides = [...root.querySelectorAll<HTMLElement>("[data-slide]")];
+    if (!track || slides.length < 2) return;
+
+    const current = root.querySelector<HTMLElement>("[data-current]");
+    const progress = root.querySelector<HTMLElement>("[data-progress]");
+    const progressBar = root.querySelector<HTMLElement>("[data-progress-bar]");
+    const toggle = root.querySelector<HTMLButtonElement>("[data-toggle]");
+    const iconPause = root.querySelector("[data-icon-pause]");
+    const iconPlay = root.querySelector("[data-icon-play]");
+    const prev = root.querySelector("[data-prev]");
+    const next = root.querySelector("[data-next]");
+
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    // Autoplay runs only while nothing is pausing it. "user" is sticky (the
+    // pause button); the rest come and go.
+    const pausedBy = new Set<string>();
+    if (reduceMotion) pausedBy.add("motion");
+
+    let index = 0;
+    // Slide a programmatic scroll is heading to; the counter ignores the
+    // slides it passes on the way so quick clicks step one slide each
+    let target: number | null = null;
+    let targetTimer = 0;
+    let elapsed = 0;
+    let last = 0;
+    let frame = 0;
+    let scrollFrame = 0;
+
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const playing = () => pausedBy.size === 0;
+
+    const setProgress = (value: number) => {
+      if (progress) progress.style.transform = `scaleX(${value})`;
+    };
+
+    const setIndex = (i: number) => {
+      if (i === index) return;
+      index = i;
+      elapsed = 0;
+      setProgress(0);
+      if (current) current.textContent = pad(index + 1);
+    };
+
+    const goTo = (i: number) => {
+      target = (i + slides.length) % slides.length;
+      setIndex(target);
+      // scrollTo on the track only: scrollIntoView would scroll the page too
+      track.scrollTo({
+        left: slides[target].offsetLeft,
+        behavior: reduceMotion ? "auto" : "smooth",
+      });
+      // Fallback for browsers without scrollend
+      clearTimeout(targetTimer);
+      targetTimer = window.setTimeout(() => (target = null), 1000);
+    };
+
+    const onScrollEnd = () => {
+      target = null;
+      onScroll();
+    };
+
+    // A swipe or wheel takes over from any scroll in progress
+    const onUserScroll = () => {
+      target = null;
+    };
+
+    const tick = (now: number) => {
+      elapsed += now - last;
+      last = now;
+      if (elapsed >= INTERVAL) {
+        elapsed = 0;
+        goTo(index + 1);
+      }
+      setProgress(elapsed / INTERVAL);
+      frame = requestAnimationFrame(tick);
+    };
+
+    const update = () => {
+      cancelAnimationFrame(frame);
+      track.setAttribute("aria-live", playing() ? "off" : "polite");
+      if (playing()) {
+        last = performance.now();
+        frame = requestAnimationFrame(tick);
+      }
+    };
+
+    const pause = (reason: string) => {
+      pausedBy.add(reason);
+      update();
+    };
+    const resume = (reason: string) => {
+      pausedBy.delete(reason);
+      update();
+    };
+
+    // Keep the counter in step with the scroll position, whether it moved by
+    // autoplay, the buttons or a swipe
+    const onScroll = () => {
+      if (scrollFrame) return;
+      scrollFrame = requestAnimationFrame(() => {
+        scrollFrame = 0;
+        if (target !== null) return;
+        let nearest = 0;
+        slides.forEach((slide, i) => {
+          if (
+            Math.abs(slide.offsetLeft - track.scrollLeft) <
+            Math.abs(slides[nearest].offsetLeft - track.scrollLeft)
+          )
+            nearest = i;
+        });
+        setIndex(nearest);
+      });
+    };
+
+    const onPrev = () => {
+      elapsed = 0;
+      goTo(index - 1);
+    };
+    const onNext = () => {
+      elapsed = 0;
+      goTo(index + 1);
+    };
+
+    const onToggle = () => {
+      if (pausedBy.has("user")) resume("user");
+      else pause("user");
+      const paused = pausedBy.has("user");
+      toggle?.setAttribute(
+        "aria-label",
+        paused ? "Play testimonials" : "Pause testimonials",
+      );
+      iconPause?.classList.toggle("hidden", paused);
+      iconPlay?.classList.toggle("hidden", !paused);
+    };
+
+    // Mouse hover only: on touch, pointerleave fires straight after a tap
+    const onEnter = (e: PointerEvent) => {
+      if (e.pointerType === "mouse") pause("hover");
+    };
+    const onLeave = () => resume("hover");
+
+    // Keyboard focus only, so clicking a button doesn't leave it paused
+    const onFocusIn = (e: FocusEvent) => {
+      if ((e.target as HTMLElement).matches(":focus-visible")) pause("focus");
+    };
+    const onFocusOut = (e: FocusEvent) => {
+      if (!root.contains(e.relatedTarget as Node)) resume("focus");
+    };
+
+    const onVisibility = () =>
+      document.hidden ? pause("hidden") : resume("hidden");
+
+    // Only run while the slider is on screen
+    const observer = new IntersectionObserver(([entry]) =>
+      entry.isIntersecting ? resume("offscreen") : pause("offscreen"),
+    );
+    pausedBy.add("offscreen");
+    observer.observe(track);
+
+    if (reduceMotion) {
+      progressBar?.classList.add("invisible");
+      // No autoplay, so nothing to pause. (The button's own display: grid
+      // would beat Tailwind's "hidden", so take it out instead.)
+      toggle?.remove();
+    }
+
+    track.addEventListener("scroll", onScroll, { passive: true });
+    track.addEventListener("scrollend", onScrollEnd);
+    track.addEventListener("pointerdown", onUserScroll);
+    track.addEventListener("wheel", onUserScroll, { passive: true });
+    prev?.addEventListener("click", onPrev);
+    next?.addEventListener("click", onNext);
+    toggle?.addEventListener("click", onToggle);
+    root.addEventListener("pointerenter", onEnter);
+    root.addEventListener("pointerleave", onLeave);
+    root.addEventListener("focusin", onFocusIn);
+    root.addEventListener("focusout", onFocusOut);
+    document.addEventListener("visibilitychange", onVisibility);
+
+    update();
+
+    teardown.push(() => {
+      cancelAnimationFrame(frame);
+      cancelAnimationFrame(scrollFrame);
+      clearTimeout(targetTimer);
+      observer.disconnect();
+      track.removeEventListener("scroll", onScroll);
+      track.removeEventListener("scrollend", onScrollEnd);
+      track.removeEventListener("pointerdown", onUserScroll);
+      track.removeEventListener("wheel", onUserScroll);
+      prev?.removeEventListener("click", onPrev);
+      next?.removeEventListener("click", onNext);
+      toggle?.removeEventListener("click", onToggle);
+      root.removeEventListener("pointerenter", onEnter);
+      root.removeEventListener("pointerleave", onLeave);
+      root.removeEventListener("focusin", onFocusIn);
+      root.removeEventListener("focusout", onFocusOut);
+      document.removeEventListener("visibilitychange", onVisibility);
+    });
+  }
+
+  const destroy = () => {
+    teardown.forEach((fn) => fn());
+    teardown = [];
+  };
+
+  // Set up on every page load (view transitions), tidy up before each swap
+  document.addEventListener("astro:page-load", () => {
+    destroy();
+    document
+      .querySelectorAll<HTMLElement>("[data-testimonials]")
+      .forEach(initCarousel);
+  });
+  document.addEventListener("astro:before-swap", destroy);
+</script>
