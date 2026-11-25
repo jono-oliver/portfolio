@@ -6,6 +6,7 @@ import {
   getProfile,
   getProjects,
   getResumeUrl,
+  getTestimonials,
 } from "../../sanity/useSanityHelper";
 import {
   AVAILABILITY,
@@ -23,10 +24,11 @@ import {
 } from "../../lib/markdown";
 
 export const GET: APIRoute = async () => {
-  const [profile, projects, articles] = await Promise.all([
+  const [profile, projects, articles, testimonials] = await Promise.all([
     getProfile(),
     getProjects(),
     getArticles(),
+    getTestimonials(),
   ]);
 
   const data = {
@@ -58,6 +60,12 @@ export const GET: APIRoute = async () => {
       published: a._createdAt ?? null,
       url: articleUrl(a.slug.current),
       markdown: articleMarkdownUrl(a.slug.current),
+    })),
+    testimonials: testimonials.map((t: any) => ({
+      quote: t.quote.trim(),
+      name: t.name.trim(),
+      role: t.role?.trim() || null,
+      company: t.company?.trim() || null,
     })),
     generatedAt: new Date().toISOString(),
   };

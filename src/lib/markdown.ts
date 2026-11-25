@@ -100,11 +100,12 @@ export function profileToMarkdown(profile: any, cvUrl: string | null): string {
 }
 
 // Home page: the profile plus the recent projects the page features, with
-// links to each project's markdown version.
+// links to each project's markdown version, and the testimonials.
 export function homeToMarkdown(
   profile: any,
   cvUrl: string | null,
   projects: any[],
+  testimonials: any[] = [],
 ): string {
   const recent = projects.map((p) => {
     const excerpt = p.projectExcerpt?.trim();
@@ -113,6 +114,8 @@ export function homeToMarkdown(
   return [
     profileToMarkdown(profile, cvUrl).trimEnd(),
     recent.length && `## Recent projects\n\n${recent.join("\n")}`,
+    testimonials.length &&
+      `## Testimonials\n\n${testimonials.map(testimonialToMarkdown).join("\n\n")}`,
     `## More\n\n${[
       `- [All projects](${absoluteUrl("/portfolio/")})`,
       `- [Blog](${absoluteUrl("/blog/")})`,
@@ -122,6 +125,19 @@ export function homeToMarkdown(
     .filter(Boolean)
     .join("\n\n")
     .concat("\n");
+}
+
+function testimonialToMarkdown(t: any): string {
+  const quote = t.quote
+    .trim()
+    .split("\n")
+    .map((line: string) => `> ${line}`.trimEnd())
+    .join("\n");
+  const byline = [t.name, t.role, t.company]
+    .map((part) => part?.trim())
+    .filter(Boolean)
+    .join(", ");
+  return `${quote}\n>\n> — ${byline}`;
 }
 
 export const markdownResponse = (body: string) =>
