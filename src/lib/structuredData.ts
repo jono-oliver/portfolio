@@ -11,6 +11,7 @@ import {
   SITE_URL,
   absoluteUrl,
 } from "../data/site";
+import { articleTldrText, projectTldrText } from "./tldr";
 
 const CONTEXT = "https://schema.org";
 const personRef = { "@id": PERSON_ID };
@@ -58,6 +59,7 @@ export function blogPostingSchema(
     "@type": "BlogPosting",
     headline: article.articleTitle,
     description: article.articleExcerpt,
+    abstract: articleTldrText(article) || undefined,
     image: imageUrl,
     datePublished: article._createdAt,
     dateModified: article._updatedAt ?? article._createdAt,
@@ -80,6 +82,7 @@ export function projectSchema(project: any, url: string, imageUrl?: string) {
     "@type": "CreativeWork",
     name: project.projectTitle,
     description: project.projectExcerpt,
+    abstract: projectTldrText(project) || undefined,
     image: imageUrl,
     dateCreated: project._createdAt,
     dateModified: project._updatedAt ?? project._createdAt,

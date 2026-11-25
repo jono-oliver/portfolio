@@ -1,0 +1,70 @@
+---
+// The TL;DR pane's content, shared by project and article pages.
+// sections: [{ heading, text?, list? }]; snippet: a Sanity code value.
+import Prose from "./Prose.astro";
+import Code from "./Code.astro";
+
+interface Section {
+  heading: string;
+  text?: string;
+  list?: string[];
+}
+
+const {
+  sections = [],
+  snippet,
+  fullLabel,
+} = Astro.props as {
+  sections: Section[];
+  snippet?: { code: string; language?: string } | null;
+  fullLabel: string;
+};
+---
+
+<div data-xray="Tldr">
+  <Prose reveal={false} compact>
+    {
+      sections.map(({ heading, text, list }) => (
+        <section>
+          <h2>{heading}</h2>
+          {text && <p>{text}</p>}
+          {list?.length ? (
+            <ul>
+              {list.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          ) : null}
+        </section>
+      ))
+    }
+    {
+      snippet && (
+        <section>
+          <h2>Key snippet</h2>
+          <Code node={snippet} />
+        </section>
+      )
+    }
+    <p class="not-prose mt-12">
+      <button
+        type="button"
+        data-reading-set="full"
+        class="group inline-flex items-center gap-2 rounded-full border border-ink px-5 py-2.5 text-sm font-medium transition-colors hover:bg-ink hover:text-paper"
+      >
+        {fullLabel}
+        <span
+          class="inline-block transition-transform duration-500 ease-out-expo group-hover:translate-x-1"
+          aria-hidden="true">&rarr;</span
+        >
+      </button>
+    </p>
+  </Prose>
+</div>
+
+<style>
+  /* Sit the first heading close to the toggle above */
+  section:first-of-type > h2 {
+    margin-top: 0;
+  }
+</style>

@@ -53,6 +53,40 @@ export default {
       },
     },
     {
+      name: "articleTldr",
+      title: "TL;DR",
+      description:
+        "Optional. A short version of the article for readers in a hurry. When filled in, the article page gets a Full read / TL;DR toggle, and the TL;DR is added to the page's markdown version.",
+      type: "object",
+      options: { collapsible: true, collapsed: true },
+      fields: [
+        {
+          name: "takeaways",
+          title: "Key takeaways",
+          description: "Three to five short bullets.",
+          type: "array",
+          of: [{ type: "string" }],
+          validation: (Rule) =>
+            Rule.max(5).warning("Keep it to five bullets or fewer."),
+        },
+        {
+          name: "snippet",
+          title: "Key snippet",
+          description: "Optional. The one piece of code that matters.",
+          type: "code",
+          options: {
+            language: "javascript",
+            languageAlternatives: [
+              { title: "JavaScript", value: "javascript" },
+              { title: "HTML", value: "html" },
+              { title: "CSS", value: "css" },
+              { title: "JSON", value: "json" },
+            ],
+          },
+        },
+      ],
+    },
+    {
       name: "articleDescription",
       type: "array",
       title: "Content",

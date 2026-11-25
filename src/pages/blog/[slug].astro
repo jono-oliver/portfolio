@@ -4,6 +4,8 @@ import PortableText from "../../components/PortableText.astro";
 import DetailHeader from "../../components/DetailHeader.astro";
 import NextLink from "../../components/NextLink.astro";
 import Prose from "../../components/Prose.astro";
+import ReadingModes from "../../components/ReadingModes.astro";
+import Tldr from "../../components/Tldr.astro";
 import { absoluteUrl, pageTitle } from "../../data/site";
 import { breadcrumbSchema, blogPostingSchema } from "../../lib/structuredData";
 import {
@@ -12,6 +14,12 @@ import {
   urlFor,
   getProfile,
 } from "../../sanity/useSanityHelper";
+import {
+  articleTldr,
+  articleTldrMinutes,
+  hasArticleTldr,
+  readingMinutes,
+} from "../../lib/tldr";
 
 export async function getStaticPaths() {
   const articles = await getArticles();
@@ -40,6 +48,10 @@ const {
   articleTags,
   articleDescription,
 } = article;
+const tldr = hasArticleTldr(article) ? articleTldr(article) : null;
+const tldrSections = tldr?.takeaways.length
+  ? [{ heading: "Key takeaways", list: tldr.takeaways }]
+  : [];
 const pageUrl = absoluteUrl(`/blog/${slug}/`);
 const metaImageUrl = urlFor(articleImage).url();
 const jsonLd = [
@@ -72,9 +84,28 @@ const jsonLd = [
     transitionName={`blog-${slug}`}
   />
 
-  <Prose>
-    <PortableText value={articleDescription} />
-  </Prose>
+  {
+    tldr ? (
+      <ReadingModes
+        fullMinutes={readingMinutes(articleDescription)}
+        tldrMinutes={articleTldrMinutes(article)}
+      >
+        <Tldr
+          slot="tldr"
+          sections={tldrSections}
+          snippet={tldr.snippet}
+          fullLabel="Read the full article"
+        />
+        <Prose reveal={false} compact>
+          <PortableText value={articleDescription} />
+        </Prose>
+      </ReadingModes>
+    ) : (
+      <Prose>
+        <PortableText value={articleDescription} />
+      </Prose>
+    )
+  }
 
   {
     next && (

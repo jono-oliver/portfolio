@@ -95,14 +95,27 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site).href;
         root.classList.add("js");
       };
 
+      // Full read or TL;DR on project and article pages (see
+      // ReadingModes.astro): a #tldr link wins, then the saved choice
+      const applyReading = (root, hash) => {
+        let stored = null;
+        try {
+          stored = localStorage.getItem("reading");
+        } catch (e) {}
+        root.dataset.reading =
+          hash === "#tldr" || stored === "tldr" ? "tldr" : "full";
+      };
+
       applyTheme(document.documentElement);
+      applyReading(document.documentElement, location.hash);
       // Astro's swap replaces <html>'s attributes with the incoming page's.
       // Put the classes on the incoming page first so "js" never drops off;
       // if it does, the swap's scroll reset can flush styles in between and
       // the reveals start animating out, then back in (seen on mobile).
-      document.addEventListener("astro:before-swap", (e) =>
-        applyTheme(e.newDocument.documentElement),
-      );
+      document.addEventListener("astro:before-swap", (e) => {
+        applyTheme(e.newDocument.documentElement);
+        applyReading(e.newDocument.documentElement, e.to.hash);
+      });
     </script>
 
     <ViewTransitions />

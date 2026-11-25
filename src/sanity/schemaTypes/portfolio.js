@@ -45,6 +45,39 @@ export default {
       },
     },
     {
+      name: "projectTldr",
+      title: "TL;DR",
+      description:
+        "Optional. A short version of the case study for readers in a hurry. When filled in, the project page gets a Full read / TL;DR toggle, and the TL;DR is added to the page's markdown version.",
+      type: "object",
+      options: { collapsible: true, collapsed: true },
+      fields: [
+        {
+          name: "problem",
+          title: "Problem",
+          description: "The problem or brief, in a sentence or two.",
+          type: "text",
+          rows: 2,
+        },
+        {
+          name: "built",
+          title: "What I built",
+          description: "Three to five short bullets.",
+          type: "array",
+          of: [{ type: "string" }],
+          validation: (Rule) =>
+            Rule.max(5).warning("Keep it to five bullets or fewer."),
+        },
+        {
+          name: "outcome",
+          title: "Outcome",
+          description: "The result or impact.",
+          type: "text",
+          rows: 2,
+        },
+      ],
+    },
+    {
       name: "projectDescription",
       title: "Project Description",
       type: "array",

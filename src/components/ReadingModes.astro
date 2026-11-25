@@ -1,0 +1,150 @@
+---
+// Full read / TL;DR toggle for project and article pages. Both panes are
+// rendered at build time; html[data-reading] picks which one shows. That
+// attribute is set before paint by the inline script in Layout.astro (from
+// #tldr or the saved choice), so the right pane shows with no flash. Without
+// JavaScript the toggle is hidden and only the full body shows.
+//
+// The toggle row is text-lg so its 68ch max width matches the prose-lg body.
+//
+// No data-reveal inside the panes: a reveal in a hidden pane would never
+// become visible. The wrapper's reveal covers both.
+const { fullMinutes, tldrMinutes } = Astro.props;
+---
+
+<section data-xray="ReadingModes" data-reveal="up">
+  <div
+    class="mx-auto flex max-w-measure scroll-mt-24 flex-wrap items-center gap-x-4 gap-y-2 px-4 pt-12 text-lg lg:scroll-mt-28 lg:pt-16"
+    data-reading-toggle
+  >
+    <span class="eyebrow" id="reading-mode-label">Reading mode</span>
+    <div
+      class="inline-flex rounded-full border border-line p-1"
+      role="group"
+      aria-labelledby="reading-mode-label"
+    >
+      <button
+        type="button"
+        data-reading-set="full"
+        aria-controls="reading-pane-full"
+        aria-pressed="true"
+        class="rounded-full px-4 py-1.5 text-sm text-muted transition-colors duration-300 hover:text-ink aria-pressed:bg-ink aria-pressed:text-paper"
+      >
+        Full read <span class="opacity-70">· {fullMinutes} min</span>
+      </button>
+      <button
+        type="button"
+        data-reading-set="tldr"
+        aria-controls="reading-pane-tldr"
+        aria-pressed="false"
+        class="rounded-full px-4 py-1.5 text-sm text-muted transition-colors duration-300 hover:text-ink aria-pressed:bg-ink aria-pressed:text-paper"
+      >
+        TL;DR <span class="opacity-70">· {tldrMinutes} min</span>
+      </button>
+    </div>
+    <p class="sr-only" aria-live="polite" data-reading-status></p>
+  </div>
+
+  <div data-pane="tldr" id="reading-pane-tldr">
+    <slot name="tldr" />
+  </div>
+  <div data-pane="full" id="reading-pane-full">
+    <slot />
+  </div>
+</section>
+
+<script>
+  type Mode = "full" | "tldr";
+  const HASH = "#tldr";
+  const root = document.documentElement;
+  const current = (): Mode =>
+    root.dataset.reading === "tldr" ? "tldr" : "full";
+
+  const sync = (announce = false) => {
+    const mode = current();
+    document
+      .querySelectorAll("[data-reading-toggle] [data-reading-set]")
+      .forEach((b) =>
+        b.setAttribute(
+          "aria-pressed",
+          String(b.getAttribute("data-reading-set") === mode),
+        ),
+      );
+    const status = document.querySelector("[data-reading-status]");
+    if (status && announce)
+      status.textContent =
+        mode === "tldr" ? "Showing the TL;DR" : "Showing the full read";
+  };
+
+  const setMode = (mode: Mode) => {
+    const toggle = document.querySelector<HTMLElement>("[data-reading-toggle]");
+    if (!toggle) return;
+    root.dataset.reading = mode;
+    try {
+      localStorage.setItem("reading", mode);
+    } catch (e) {}
+    const url = location.pathname + location.search;
+    history.replaceState(history.state, "", mode === "tldr" ? url + HASH : url);
+    sync(true);
+
+    // Switching from far down a long body would leave the reader in empty
+    // space, so bring the toggle back into view
+    if (toggle.getBoundingClientRect().top < 0) {
+      const reduce = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+      toggle.scrollIntoView({
+        block: "start",
+        behavior: reduce ? "instant" : "smooth",
+      });
+    }
+  };
+
+  // Delegated so it keeps working after view transitions swap the page
+  document.addEventListener("click", (e) => {
+    const button = (e.target as Element).closest("[data-reading-set]");
+    if (!button) return;
+    const mode = button.getAttribute("data-reading-set") as Mode;
+    if (mode !== current()) setMode(mode);
+  });
+
+  document.addEventListener("astro:page-load", () => sync());
+
+  // Shareable link: #tldr opens straight into the TL;DR
+  window.addEventListener("hashchange", () => {
+    if (location.hash === HASH) setMode("tldr");
+  });
+</script>
+
+<style is:global>
+  [data-pane="tldr"],
+  html[data-reading="tldr"] [data-pane="full"] {
+    display: none;
+  }
+
+  html[data-reading="tldr"] [data-pane="tldr"] {
+    display: block;
+  }
+
+  html:not(.js) [data-reading-toggle] {
+    display: none;
+  }
+
+  /* Opacity only: a sideways slide on a full-width box causes side scroll
+     on iOS Safari */
+  .js [data-pane] {
+    animation: reading-pane-in 0.4s ease-out;
+  }
+
+  @keyframes reading-pane-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .js [data-pane] {
+      animation: none;
+    }
+  }
+</style>
