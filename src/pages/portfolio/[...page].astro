@@ -30,7 +30,7 @@ const pageSuffix = page.currentPage > 1 ? ` – Page ${page.currentPage}` : "";
 <Layout
   title={pageTitle(profile, `Portfolio${pageSuffix}`)}
   metaTitle={`Portfolio${pageSuffix}`}
-  metaDescription="A Showcase of Cutting-Edge Front-End Projects"
+  metaDescription="A Showcase of Cutting-Edge Projects"
   metaImage={OG_IMAGE}
   metaUrl={absoluteUrl(page.url.current)}
   jsonLd={breadcrumbSchema(crumbs)}
@@ -39,7 +39,7 @@ const pageSuffix = page.currentPage > 1 ? ` – Page ${page.currentPage}` : "";
     page={page}
     type="portfolio"
     title="Portfolio"
-    subTitle="A Showcase of Cutting-Edge Front-End Projects"
+    subTitle="A Showcase of Cutting-Edge Projects"
     label="Recent projects"
     filters={filters}
     total={total}
