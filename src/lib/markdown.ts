@@ -65,6 +65,8 @@ export function articleToMarkdown(article: any): string {
     article.articleExcerpt?.trim() && `> ${article.articleExcerpt.trim()}`,
     metaLine([
       `URL: ${url}`,
+      article.articleTechStack?.length &&
+        `Stack: ${article.articleTechStack.join(", ")}`,
       article.articleTags?.length && `Tags: ${article.articleTags.join(", ")}`,
       article._createdAt && `Published: ${formatDate(article._createdAt)}`,
     ]),

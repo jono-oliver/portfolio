@@ -56,6 +56,7 @@ export const GET: APIRoute = async () => {
     articles: articles.map((a: any) => ({
       title: a.articleTitle,
       excerpt: a.articleExcerpt?.trim() ?? null,
+      stack: a.articleTechStack ?? [],
       tags: a.articleTags ?? [],
       published: a._createdAt ?? null,
       url: articleUrl(a.slug.current),

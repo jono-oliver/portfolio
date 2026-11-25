@@ -61,7 +61,11 @@ export function blogPostingSchema(
     image: imageUrl,
     datePublished: article._createdAt,
     dateModified: article._updatedAt ?? article._createdAt,
-    keywords: article.articleTags?.join(", "),
+    keywords:
+      [
+        ...(article.articleTechStack ?? []),
+        ...(article.articleTags ?? []),
+      ].join(", ") || undefined,
     url,
     mainEntityOfPage: url,
     inLanguage: "en-GB",

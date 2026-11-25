@@ -1,0 +1,70 @@
+---
+// The Work and Blog listings: heading, technology filter, cards and
+// pagination. Used by the unfiltered and the /tech/<slug> routes.
+import type { Page } from "astro";
+import type { TechFilterOption } from "../lib/techFilter";
+import Article from "./Article.astro";
+import HeadingBlock from "./HeadingBlock.astro";
+import Pagination from "./Pagination.astro";
+import TechFilter from "./TechFilter.astro";
+
+interface Props {
+  page: Page<any>;
+  type: "portfolio" | "blog";
+  title: string;
+  subTitle: string;
+  label: string;
+  filters: TechFilterOption[];
+  total: number;
+  activeTech?: string;
+}
+
+const { page, type, title, subTitle, label, filters, total, activeTech } =
+  Astro.props;
+const baseUrl = `/${type}`;
+const pageBaseUrl = activeTech ? `${baseUrl}/tech/${activeTech}` : baseUrl;
+
+const card = (item: any) =>
+  type === "blog"
+    ? {
+        title: item.articleTitle,
+        excerpt: item.articleExcerpt,
+        image: item.articleCardImage ?? item.articleImage,
+        // Articles without technologies yet still show their tags
+        stack: item.techStack?.length ? item.techStack : item.articleTags,
+      }
+    : {
+        title: item.projectTitle,
+        excerpt: item.projectExcerpt,
+        image: item.projectCardImage ?? item.projectImage,
+        stack: item.techStack,
+      };
+---
+
+<HeadingBlock title={title} subTitle={subTitle} label={label} />
+<section class="container pb-16 lg:pb-24">
+  <TechFilter
+    baseUrl={baseUrl}
+    filters={filters}
+    activeTech={activeTech}
+    total={total}
+  />
+  {
+    page.data.map((item, index) => {
+      const { title, excerpt, image, stack } = card(item);
+      return (
+        <Article
+          key={item._id}
+          index={index}
+          type={type}
+          slug={item.slug.current}
+          title={title}
+          excerpt={excerpt}
+          projectImage={image}
+          stack={stack}
+        />
+      );
+    })
+  }
+  <Pagination page={page} baseUrl={pageBaseUrl} />
+</section>
