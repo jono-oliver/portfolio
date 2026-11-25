@@ -22,9 +22,18 @@ export default {
     {
       name: "articleTags",
       title: "Article Tags",
-      description: "Shown under “Tags” on the article page.",
+      description:
+        "Shown under “Tags” on the article page. For topics that aren't technologies (pick those under Article Tech Stack).",
       type: "array",
       of: [{ type: "string" }],
+    },
+    {
+      name: "articleTechStack",
+      title: "Article Tech Stack",
+      description:
+        "Shown on the blog card and used for the technology filter on the blog list. Pick technologies: each one's icon is set once on the Technology and shown wherever it's used.",
+      type: "array",
+      of: [{ type: "reference", to: [{ type: "technology" }] }],
     },
     {
       name: "articleExcerpt",

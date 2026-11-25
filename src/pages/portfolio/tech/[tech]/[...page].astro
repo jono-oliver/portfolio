@@ -1,0 +1,63 @@
+---
+import type { GetStaticPaths, Page } from "astro";
+import ArticleListing from "../../../../components/ArticleListing.astro";
+import Layout from "../../../../layouts/Layout.astro";
+import { breadcrumbSchema } from "../../../../lib/structuredData";
+import {
+  techFilters,
+  withTech,
+  type TechFilterOption,
+} from "../../../../lib/techFilter";
+import { OG_IMAGE, absoluteUrl, pageTitle } from "../../../../data/site";
+import { getProjects, getProfile } from "../../../../sanity/useSanityHelper";
+
+// /portfolio/tech/<slug>: the projects that use one technology, paginated like /portfolio
+export const getStaticPaths = (async ({ paginate }) => {
+  const projects = await getProjects();
+  const filters = techFilters(projects);
+  return filters.flatMap((tech) =>
+    paginate(withTech(projects, tech.slug), {
+      pageSize: 6,
+      params: { tech: tech.slug },
+      props: { tech, filters, total: projects.length },
+    }),
+  );
+}) satisfies GetStaticPaths;
+
+const { page, tech, filters, total } = Astro.props as {
+  page: Page<any>;
+  tech: TechFilterOption;
+  filters: TechFilterOption[];
+  total: number;
+};
+const crumbs = [
+  { name: "Work", path: "/portfolio/" },
+  { name: tech.name, path: `/portfolio/tech/${tech.slug}/` },
+];
+if (page.currentPage > 1)
+  crumbs.push({ name: `Page ${page.currentPage}`, path: page.url.current });
+const profile = await getProfile();
+const pageSuffix = page.currentPage > 1 ? ` – Page ${page.currentPage}` : "";
+const heading = `Portfolio – ${tech.name}`;
+const description = `Projects built with ${tech.name}`;
+---
+
+<Layout
+  title={pageTitle(profile, `${heading}${pageSuffix}`)}
+  metaTitle={`${heading}${pageSuffix}`}
+  metaDescription={description}
+  metaImage={OG_IMAGE}
+  metaUrl={absoluteUrl(page.url.current)}
+  jsonLd={breadcrumbSchema(crumbs)}
+>
+  <ArticleListing
+    page={page}
+    type="portfolio"
+    title="Portfolio"
+    subTitle={description}
+    label="Recent projects"
+    filters={filters}
+    total={total}
+    activeTech={tech.slug}
+  />
+</Layout>

@@ -1,22 +1,30 @@
 import { sanityClient } from "sanity:client";
 import imageUrlBuilder from "@sanity/image-url";
 import { skillName } from "../data/profile";
+import { techSlug } from "../lib/techFilter";
 
 const builder = imageUrlBuilder(sanityClient);
 
-// Tech stack items are references to Technology documents (or plain strings
-// before the tech-stack-to-references migration). This resolves the
+// Tech stacks are references to Technology documents (or plain strings
+// before the tech-stack-to-references migration). These resolve the
 // references alongside the raw list, item for item.
 const PROJECT_FIELDS = `{
   ...,
   "techStackResolved": projectTechStack[]->{ name, icon, customIcon }
 }`;
 
+const ARTICLE_FIELDS = `{
+  ...,
+  "techStackResolved": articleTechStack[]->{ name, icon, customIcon }
+}`;
+
 export async function getProjects() {
   const projects = await sanityClient.fetch(
     `*[_type == "portfolio"] | order(_createdAt desc) ${PROJECT_FIELDS}`,
   );
-  return Promise.all(projects.map(withTechStack));
+  return Promise.all(
+    projects.map((project) => withTechStack(project, "projectTechStack")),
+  );
 }
 
 export async function getProject(slug) {
@@ -26,14 +34,15 @@ export async function getProject(slug) {
       slug,
     },
   );
-  return project && withTechStack(project);
+  return project && withTechStack(project, "projectTechStack");
 }
 
-// Gives a project `projectTechStack` as plain names (for text, JSON-LD and
-// markdown) and `techStack` as { name, iconDataUri } (for the pills)
-async function withTechStack(project) {
-  const { techStackResolved = [], ...rest } = project;
-  const items = (project.projectTechStack ?? [])
+// Gives a project or article its tech stack `field` (projectTechStack or
+// articleTechStack) as plain names (for text, JSON-LD and markdown) and
+// `techStack` as { name, slug, iconDataUri } (for the pills and filters)
+async function withTechStack(doc, field) {
+  const { techStackResolved = [], ...rest } = doc;
+  const items = (doc[field] ?? [])
     .map((item, i) =>
       typeof item === "string" ? { name: item } : techStackResolved?.[i],
     )
@@ -41,32 +50,36 @@ async function withTechStack(project) {
   const techStack = await Promise.all(
     items.map(async (item) => ({
       name: item.name.trim(),
+      slug: techSlug(item.name.trim()),
       iconDataUri: await iconDataUriFor(item),
     })),
   );
   return {
     ...rest,
-    projectTechStack: techStack.map((item) => item.name),
+    [field]: techStack.map((item) => item.name),
     techStack,
   };
 }
 
 export async function getArticles() {
-  return await sanityClient.fetch(
-    `*[_type == "article"] | order(_createdAt desc)`,
+  const articles = await sanityClient.fetch(
+    `*[_type == "article"] | order(_createdAt desc) ${ARTICLE_FIELDS}`,
+  );
+  return Promise.all(
+    articles.map((article) => withTechStack(article, "articleTechStack")),
   );
 }
 
 export async function getArticle(slug) {
-  return await sanityClient.fetch(
-    `*[_type == "article" && slug.current == $slug][0]`,
+  const article = await sanityClient.fetch(
+    `*[_type == "article" && slug.current == $slug][0] ${ARTICLE_FIELDS}`,
     {
       slug,
     },
   );
+  return article && withTechStack(article, "articleTechStack");
 }
 
-// Testimonials for the home page slider, newest first. Only complete ones.
 export async function getTestimonials() {
   return await sanityClient.fetch(
     `*[_type == "testimonial" && defined(quote) && defined(name)]

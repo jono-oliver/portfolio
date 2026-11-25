@@ -1,19 +1,25 @@
 ---
 import type { GetStaticPaths, Page } from "astro";
-import Article from "../../components/Article.astro";
-import HeadingBlock from "../../components/HeadingBlock.astro";
-import Pagination from "../../components/Pagination.astro";
+import ArticleListing from "../../components/ArticleListing.astro";
 import Layout from "../../layouts/Layout.astro";
 import { breadcrumbSchema } from "../../lib/structuredData";
+import { techFilters, type TechFilterOption } from "../../lib/techFilter";
 import { OG_IMAGE, absoluteUrl, pageTitle } from "../../data/site";
 import { getProjects, getProfile } from "../../sanity/useSanityHelper";
 
 export const getStaticPaths = (async ({ paginate }) => {
   const projects = await getProjects();
-  return paginate(projects, { pageSize: 6 });
+  return paginate(projects, {
+    pageSize: 6,
+    props: { filters: techFilters(projects), total: projects.length },
+  });
 }) satisfies GetStaticPaths;
 
-const { page } = Astro.props as { page: Page<any> };
+const { page, filters, total } = Astro.props as {
+  page: Page<any>;
+  filters: TechFilterOption[];
+  total: number;
+};
 const crumbs = [{ name: "Work", path: "/portfolio/" }];
 if (page.currentPage > 1)
   crumbs.push({ name: `Page ${page.currentPage}`, path: page.url.current });
@@ -29,26 +35,13 @@ const pageSuffix = page.currentPage > 1 ? ` – Page ${page.currentPage}` : "";
   metaUrl={absoluteUrl(page.url.current)}
   jsonLd={breadcrumbSchema(crumbs)}
 >
-  <HeadingBlock
+  <ArticleListing
+    page={page}
+    type="portfolio"
     title="Portfolio"
     subTitle="A Showcase of Cutting-Edge Front-End Projects"
     label="Recent projects"
+    filters={filters}
+    total={total}
   />
-  <section class="container pb-16 lg:pb-24">
-    {
-      page.data.map((project, index) => (
-        <Article
-          key={project._id}
-          index={index}
-          type="portfolio"
-          slug={project.slug.current}
-          title={project.projectTitle}
-          excerpt={project.projectExcerpt}
-          projectImage={project.projectCardImage ?? project.projectImage}
-          stack={project.techStack}
-        />
-      ))
-    }
-    <Pagination page={page} baseUrl="/portfolio" />
-  </section>
 </Layout>

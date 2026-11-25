@@ -1,0 +1,120 @@
+---
+// Technology filter for the Work and Blog listings. Plain links to the static
+// /<type>/tech/<slug> routes, so it works without JS and can be shared.
+// Below lg, only the most used technologies show until "Show more" is
+// pressed. The active one always shows. Without JS, everything shows.
+import type { TechFilterOption } from "../lib/techFilter";
+import SkillIcon from "./SkillIcon.astro";
+
+interface Props {
+  baseUrl: string;
+  filters: TechFilterOption[];
+  activeTech?: string;
+  total: number;
+}
+
+const { baseUrl, filters, activeTech, total } = Astro.props;
+
+// How many technologies show on mobile before "Show more"
+const MOBILE_LIMIT = 7;
+const hiddenCount = filters.filter(
+  (tech, i) => i >= MOBILE_LIMIT && tech.slug !== activeTech,
+).length;
+
+const pill =
+  "inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs transition-colors duration-300";
+const idle = "border-line text-muted hover:border-ink hover:text-ink";
+const active = "border-accent bg-accent text-white";
+---
+
+{
+  filters.length > 0 && (
+    <nav
+      data-xray="TechFilter"
+      data-tech-filter
+      aria-label="Filter by technology"
+      class="pb-10 lg:pb-12"
+      data-reveal="up"
+      style="--reveal-delay: 250ms"
+    >
+      <ul id="tech-filter-list" class="flex flex-wrap gap-2">
+        <li>
+          <a
+            href={baseUrl}
+            class:list={[pill, activeTech ? idle : active]}
+            aria-current={activeTech ? undefined : "page"}
+          >
+            All
+            <span class="opacity-70">{total}</span>
+          </a>
+        </li>
+        {filters.map((tech, i) => {
+          const isActive = tech.slug === activeTech;
+          // The active pill links back to the unfiltered list, so clicking
+          // it again clears the filter
+          return (
+            <li data-extra={i >= MOBILE_LIMIT && !isActive ? "" : undefined}>
+              <a
+                href={isActive ? baseUrl : `${baseUrl}/tech/${tech.slug}`}
+                class:list={[pill, isActive ? active : idle]}
+                aria-label={isActive ? `Clear ${tech.name} filter` : undefined}
+              >
+                {tech.iconDataUri && <SkillIcon src={tech.iconDataUri} />}
+                {tech.name}
+                <span class="opacity-70">{tech.count}</span>
+                {isActive && (
+                  <span class="-mr-1 text-sm leading-none" aria-hidden="true">
+                    &times;
+                  </span>
+                )}
+              </a>
+            </li>
+          );
+        })}
+        {hiddenCount > 0 && (
+          <li class="tech-filter-toggle lg:hidden">
+            <button
+              type="button"
+              data-tech-filter-toggle
+              data-more={`+${hiddenCount} more`}
+              aria-expanded="false"
+              aria-controls="tech-filter-list"
+              class:list={[pill, "border-dashed", idle]}
+            >
+              +{hiddenCount} more
+            </button>
+          </li>
+        )}
+      </ul>
+    </nav>
+  )
+}
+
+<style>
+  /* The toggle only works with JS, so it and the collapsing need html.js */
+  .tech-filter-toggle {
+    display: none;
+  }
+  @media (max-width: 1023px) {
+    :global(html.js) .tech-filter-toggle {
+      display: list-item;
+    }
+    :global(html.js) [data-tech-filter]:not([data-expanded]) [data-extra] {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  // One delegated listener, so it keeps working after view transitions
+  document.addEventListener("click", (event) => {
+    const button = (event.target as Element).closest<HTMLButtonElement>(
+      "[data-tech-filter-toggle]",
+    );
+    const nav = button?.closest<HTMLElement>("[data-tech-filter]");
+    if (!button || !nav) return;
+    const expanded = nav.toggleAttribute("data-expanded");
+    button.setAttribute("aria-expanded", String(expanded));
+    button.textContent = expanded ? "Show less" : (button.dataset.more ?? "");
+  });
+</script>

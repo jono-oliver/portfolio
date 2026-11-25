@@ -1,0 +1,63 @@
+---
+import type { GetStaticPaths, Page } from "astro";
+import ArticleListing from "../../../../components/ArticleListing.astro";
+import Layout from "../../../../layouts/Layout.astro";
+import { breadcrumbSchema } from "../../../../lib/structuredData";
+import {
+  techFilters,
+  withTech,
+  type TechFilterOption,
+} from "../../../../lib/techFilter";
+import { OG_IMAGE, absoluteUrl, pageTitle } from "../../../../data/site";
+import { getArticles, getProfile } from "../../../../sanity/useSanityHelper";
+
+// /blog/tech/<slug>: the articles that use one technology, paginated like /blog
+export const getStaticPaths = (async ({ paginate }) => {
+  const articles = await getArticles();
+  const filters = techFilters(articles);
+  return filters.flatMap((tech) =>
+    paginate(withTech(articles, tech.slug), {
+      pageSize: 6,
+      params: { tech: tech.slug },
+      props: { tech, filters, total: articles.length },
+    }),
+  );
+}) satisfies GetStaticPaths;
+
+const { page, tech, filters, total } = Astro.props as {
+  page: Page<any>;
+  tech: TechFilterOption;
+  filters: TechFilterOption[];
+  total: number;
+};
+const crumbs = [
+  { name: "Blog", path: "/blog/" },
+  { name: tech.name, path: `/blog/tech/${tech.slug}/` },
+];
+if (page.currentPage > 1)
+  crumbs.push({ name: `Page ${page.currentPage}`, path: page.url.current });
+const profile = await getProfile();
+const pageSuffix = page.currentPage > 1 ? ` – Page ${page.currentPage}` : "";
+const heading = `Blog – ${tech.name}`;
+const description = `Articles about ${tech.name}`;
+---
+
+<Layout
+  title={pageTitle(profile, `${heading}${pageSuffix}`)}
+  metaTitle={`${heading}${pageSuffix}`}
+  metaDescription={description}
+  metaImage={OG_IMAGE}
+  metaUrl={absoluteUrl(page.url.current)}
+  jsonLd={breadcrumbSchema(crumbs)}
+>
+  <ArticleListing
+    page={page}
+    type="blog"
+    title="Blog"
+    subTitle={description}
+    label="Writing"
+    filters={filters}
+    total={total}
+    activeTech={tech.slug}
+  />
+</Layout>

@@ -72,7 +72,14 @@ process.on("SIGINT", () => process.exit(130));
 let pages = arg("pages")?.split(",");
 if (!pages) {
   // Overlays opened by hash: design system panel and recruiter view
-  pages = ["/", "/#design-system", "/#at-a-glance", "/portfolio/", "/blog/"];
+  pages = [
+    "/",
+    "/#design-system",
+    "/#at-a-glance",
+    "/portfolio/",
+    "/portfolio/tech/react/",
+    "/blog/",
+  ];
   try {
     const llms = await (await fetch(`${base}/llms.txt`)).text();
     for (const section of ["portfolio", "blog"]) {
